@@ -1,5 +1,6 @@
 package ai.jbon.jbon.adapters;
 
-public class InputAdapter {
+public abstract class InputAdapter {
 
+	public abstract double pullData();
 }
