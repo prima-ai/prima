@@ -1,3 +1,5 @@
+package ai.jbon.jbon;
+
 public class Connection {
 
     private Neuron from;     // Connection goes from. . .
