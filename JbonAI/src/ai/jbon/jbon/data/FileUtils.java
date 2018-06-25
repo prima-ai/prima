@@ -17,18 +17,12 @@ import java.io.PrintWriter;
  * The data will get encrypted before writing it
  * Saved files will get decrypted when loading them
  * 
- * @author jostsi
+ * @author SilvanJost
  *
  */
 public class FileUtils {
 
 	private static final String KEY = "DE1nLi5IscHDeK3Y-M33yBe_tHeM.AnBO1d stud_daGAe";
-	
-	public static void main(String[] args){
-		
-		System.out.println(encrypt("Hallo, das ist ein test :^)"));
-		
-	}
 	
 	/**
 	 * 
