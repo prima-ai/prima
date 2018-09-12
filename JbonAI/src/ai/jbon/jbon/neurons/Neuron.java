@@ -1,63 +1,58 @@
 package ai.jbon.jbon.neurons;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import ai.jbon.jbon.Connection;
+import ai.jbon.jbon.functions.Function;
 
 public class Neuron {
-	private float output;
-	private ArrayList<E> connections;
-	private boolean bias = false;
+	
+	private ArrayList<Connection> connections;
+	
+	protected float value;
+	
+	private Function function;
 	
 	// regular neuron
 	public Neuron() {
-		output = 0;
 		
 		connections = new ArrayList();
-		bias = false;
 	}
 	
-	// constructor for bias neuron
-	public Neuron(int i) {
-		output = i;
-		connections = new ArrayList();
-		bias = true;
-	}
 	
 	// calculate output of neuron
 	public void calcOutput() {
-		if(bias) {
-			// nothing
-		} else {
-			float sum = 0;
-			float bias = 0;
-			for(int i = 0; i<connections.size(); i++) {
-				Connection c = (Connection) connections.get(i);
-				Neuron from = c.getFrom();
-				Neuron to = c.getTo();
-				
-				if(to==this) {
-					if(from.bias) {
-						bias = from.getOutput()*c.getWeight();
-					} else {
-						sum += from.getOutput()*c.getWeight();
-					}
-				}
-			}
-			output = f(bias+sum);
+		
+		
+		List<Float> values = new ArrayList<Float>();
+		
+		for(Connection connection : connections){
+			
+			values.add(connection.getValue() * connection.getWeight());
+			
 		}
+		
+		this.value = function.getOutput(values);
+		
 	}
 	
-	void addConnection(Connection c) {
+	// Pushes the momentary value to all outgoing connections
+	public void pushOutput(){
+		
+		for(Connection conn : connections){
+			
+			conn.push(this.value);
+			
+		}
+		
+	}
+	
+	
+	public void addConnection(Connection c) {
 		connections.add(c);
 	}
-	
-	float getOutput() {
-		return output;
-	}
-	
-	// sigmond function
-	public static float f(float x) {
-		return 1.0f/(1.0f+(float)Math.exp(-x));
-	}
+
 	
 	public ArrayList getConnections() {
 		return connections;

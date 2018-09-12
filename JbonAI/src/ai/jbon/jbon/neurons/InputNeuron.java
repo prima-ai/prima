@@ -1,16 +1,10 @@
 package ai.jbon.jbon.neurons;
 
-public class InputNeuron extends Neuron {
-    public InputNeuron() {
-        super();
-    }
+public class InputNeuron extends Neuron {     
     
-    public InputNeuron(int i) {
-        super(i);
-    }
-
-    public void input(float d) {
-        output = d;
+    public void injectInput(float input){
+    	this.value = input;
+    	this.pushOutput();
     }
 
 }
