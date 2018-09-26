@@ -1,5 +1,12 @@
 package ai.jbon.jbon;
 
+import java.util.List;
+import java.util.Map;
+
+import ai.jbon.jbon.nodes.InputNode;
+import ai.jbon.jbon.nodes.Node;
+import ai.jbon.jbon.nodes.OutputNode;
+
 /**
  * Includes Input, Output and Hidden neurons to create a output
  * 
@@ -7,11 +14,17 @@ package ai.jbon.jbon;
  * 
  * Can be loaded from a .ann file or stored into one using the NetworkLoader class
  * 
- * Can be run inside a NetworkTask
- * 
- * @author jostsi
+ * @author SilvanJost
  *
  */
 public class Network {
-
+	
+	private Map<Long, Node> nodes;
+	private List<InputNode> inputNodes;
+	
+	private Injector injector;
+	
+	public Network() {
+		injector = new Injector();
+	}
 }

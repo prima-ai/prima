@@ -7,24 +7,25 @@ import java.util.List;
 import ai.jbon.jbon.nodes.Node;
 
 public class Injector {
-	
-	private List<Node> queue = new ArrayList<Node>();
-	
-	private InjectionThread thread;
-	
+
+	private final List<Node> queue;
+
+	private Thread thread;
+
 	public Injector() {
-		thread = new InjectionThread(queue);
+		queue = new ArrayList<Node>();
+		thread = new Thread(new InjectionTask(queue));
 	}
-	
+
 	public void run() {
 		thread.start();
 	}
-	
-	public void register(Node node) {
+
+	public synchronized void register(Node node) {
 		queue.add(node);
 	}
-	
-	public void register(Collection<Node> nodes) {
+
+	public synchronized void register(Collection<Node> nodes) {
 		queue.addAll(nodes);
 	}
 }

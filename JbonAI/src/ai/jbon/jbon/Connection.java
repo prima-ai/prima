@@ -1,60 +1,46 @@
 package ai.jbon.jbon;
 
-import ai.jbon.jbon.neurons.Neuron;
+import ai.jbon.jbon.nodes.Node;
 
 public class Connection {
 
-    private Neuron from;     // Connection goes from. . .
-    private Neuron to;       // To. . .
-    private float weight;   // Weight of the connection. . .
+    private Node target;
+    private float weight;
     private float value;
-
-    // Constructor  builds a connection with a random weight
-    public Connection(Neuron a_, Neuron b_) {
-    	
-        from = a_;
-        to = b_;
+    
+    public Connection(final Node target) {
+        this.target = target;
         weight = (float) Math.random()*2-1;
     }
     
-    // In case I want to set the weights manually, using this for testing
-    public Connection(Neuron a_, Neuron b_, float w) {
-    	
-        from = a_;
-        to = b_;
+    public Connection(final Node target, final float w) {
+        this.target = target;
         weight = w;
     }
-
-    // Refreshes the value in the pipeline and triggers the end neuron
-    public void push(float value){
-    	
-    	this.value = value;
-    	to.calcOutput();
-    	to.pushOutput();
-    	
+    
+    // Triggers the neuron target calculate its output and push it
+    public void push(){
+    	target.pushOutput();
+    }
+    
+    // Injects a value intarget the target node valuebuffer
+    public void injectValue(final float value) {
+    	this.value = value * this.weight;
+    	target.injectValue(this.value);
     }
     
     // Changing the weight of the connection
     public void adjustWeight(float deltaWeight) {
-    	
         weight += deltaWeight;
-        
     }
 
-    // Returns the end value with weight adjustment
+    public Node getTarget() {
+    	return this.target;
+    }
+    
     public float getValue(){
-    	
     	return value;
-    	
     }
-    
-    public Neuron getFrom() {
-        return from;
-    }
-    
-    public Neuron getTo() {
-        return to;
-    }  
     
     public float getWeight() {
         return weight;

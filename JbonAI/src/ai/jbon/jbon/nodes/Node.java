@@ -1,60 +1,53 @@
-package ai.jbon.jbon.neurons;
+package ai.jbon.jbon.nodes;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.functions.Function;
+import ai.jbon.jbon.functions.SigmoidFunction;
 
-public class Neuron {
-	
-	private ArrayList<Connection> connections;
-	
+public class Node {
+
 	protected float value;
-	
 	private Function function;
+	protected List<Connection> connections;
+	private List<Float> valueBuffer;
 	
-	// regular neuron
-	public Neuron() {
-		
-		connections = new ArrayList();
+	public Node(final List<Connection> connections) {
+		this.connections = connections;
+		valueBuffer = new ArrayList<Float>();
 	}
 	
+	public Node() {
+		this.connections = new ArrayList<Connection>();
+		valueBuffer = new ArrayList<Float>();
+		function = new SigmoidFunction();
+	}
 	
-	// calculate output of neuron
+	// Calculate value of node
 	public void calcOutput() {
-		
-		
-		List<Float> values = new ArrayList<Float>();
-		
-		for(Connection connection : connections){
-			
-			values.add(connection.getValue() * connection.getWeight());
-			
-		}
-		
-		this.value = function.getOutput(values);
-		
+		this.value = function.getOutput(valueBuffer);
+		valueBuffer.clear();
 	}
 	
-	// Pushes the momentary value to all outgoing connections
-	public void pushOutput(){
-		
-		for(Connection conn : connections){
-			
-			conn.push(this.value);
-			
-		}
-		
+	public List<Connection> pushOutput() {
+		connections.forEach(connection -> {
+			connection.injectValue(value);
+		});
+		return connections;
 	}
 	
+	// Stores the value in the valuebuffer
+	public void injectValue(final float value) {
+		this.valueBuffer.add(value);
+	}
 	
-	public void addConnection(Connection c) {
+	public void addConnection(final Connection c) {
 		connections.add(c);
 	}
 
-	
-	public ArrayList getConnections() {
-		return connections;
+	public float getValue() {
+		return value;
 	}
 }

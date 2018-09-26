@@ -1,16 +1,19 @@
 package ai.jbon.jbon.nodes;
 
-import ai.jbon.jbon.neurons.InputNeuron;
-import ai.jbon.jbon.neurons.OutputNeuron;
+import ai.jbon.jbon.Injector;
 
-public abstract class InputNode {
-
-	private InputNeuron neuron;
+public abstract class InputNode extends Node{
 	
-	protected abstract float getInputValue();
+	private Injector injector;
 	
-	public void input(){
-		float value = getInputValue();
-		neuron.injectInput(value);
+	public InputNode(Injector injector) {
+		this.injector = injector;
 	}
+	
+	public abstract void setup();
+	
+	protected void input(final float input){
+    	this.value = input;
+    	injector.register(this);
+    }
 }
