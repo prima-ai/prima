@@ -1,4 +1,4 @@
-package ai.jbon.jbon;
+package ai.jbon.jbon.injector;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +15,7 @@ public class Injector {
 	public Injector() {
 		queue = new ArrayList<Node>();
 		thread = new Thread(new InjectionTask(queue));
+		thread.setPriority(1);
 	}
 
 	public void run() {

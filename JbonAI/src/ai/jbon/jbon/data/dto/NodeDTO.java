@@ -4,20 +4,25 @@ import java.util.List;
 
 public class NodeDTO {
 
-	private long id;
+	private final int id;
+	private final String name;
+	private final List<Integer> connections;
 	
-	private List<Long> connections;
-	
-	public NodeDTO(long id, List<Long> connections) {
+	public NodeDTO(final int id, final String name, final List<Integer> connections) {
 		this.id = id;
+		this.name = name;
 		this.connections = connections;
 	}
 	
-	public long getId() {
+	public int getId() {
 		return this.id;
 	}
 	
-	public List<Long> getConnections(){
+	public String getName() {
+		return this.name;
+	}
+	
+	public List<Integer> getConnections(){
 		return this.connections;
 	}
 }

@@ -1,0 +1,155 @@
+package ai.jbon.jbon.data;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import ai.jbon.jbon.Network;
+import ai.jbon.jbon.ThreadConfig;
+import ai.jbon.jbon.data.dto.ConnectionDTO;
+import ai.jbon.jbon.data.dto.NetworkDTO;
+import ai.jbon.jbon.data.dto.NodeDTO;
+
+public class ResourceLoader {
+
+	private NetworkBuilder networkBuilder;
+	
+	private JSONParser json;
+	
+	public ResourceLoader() {
+		this.networkBuilder = new NetworkBuilder();
+		json = new JSONParser();
+	}
+	
+	public void storeThreadConfig(final ThreadConfig config, final File file) throws IOException {
+		Properties properties = config.toProperties();
+		this.storeProperties(properties, file, "JbonAI ThreadConfig");
+	}
+	
+	public ThreadConfig loadThreadConfig(final File file) throws FileNotFoundException, IOException {
+		Properties properties = loadProperties(file);
+		ThreadConfig config = new ThreadConfig();
+		config.load(properties);
+		return config;
+	}
+
+	public Network loadNetwork(final File file) throws IOException, ParseException {
+		return networkBuilder.assemble(loadNetworkDTO(file));
+	}
+	
+	public NetworkDTO loadNetworkDTO(final File file) throws IOException, ParseException {
+		String content = readAll(file);
+		JSONObject network = (JSONObject) this.json.parse(content);
+		JSONArray nodes = (JSONArray) network.get("nodes");
+		JSONArray connections = (JSONArray) network.get("connections");
+		return new NetworkDTO(parseNodes(nodes), parseConnections(connections));
+	}
+	
+	private List<NodeDTO> parseNodes(JSONArray json){
+		List<NodeDTO> dtos = new ArrayList<NodeDTO>();
+		Iterator<JSONObject> iterator = json.iterator();
+		iterator.forEachRemaining(obj -> {
+			NodeDTO dto = new NodeDTO((int) (long) obj.get("id"), (String) obj.get("name"), 
+					parseConnectionIdList(((JSONArray) obj.get("connections"))));
+			dtos.add(dto);
+		});
+		return dtos;
+	}
+	
+	private List<Integer> parseConnectionIdList(JSONArray json){
+		List<Integer> list = new ArrayList<Integer>();
+		json.parallelStream().forEach(obj -> {
+			list.add((int)(long) obj);
+		});
+		return list;
+	}
+	
+	private List<ConnectionDTO> parseConnections(JSONArray json){
+		List<ConnectionDTO> dtos = new ArrayList<ConnectionDTO>();
+		Iterator<JSONObject> iterator = json.iterator();
+		iterator.forEachRemaining(obj -> {
+			ConnectionDTO dto = new ConnectionDTO((int) (long) obj.get("id"), (int) (long) obj.get("targetId"), 
+					(float) (double) obj.get("weight"));
+			dtos.add(dto);
+		});
+		return dtos;
+	}
+	
+	public void storeNetwork(final Network network, final File file) throws FileNotFoundException {
+		NetworkDTO dto = networkBuilder.disassemble(network);
+		JSONObject json = new JSONObject();
+		JSONArray array = new JSONArray();
+		json.put("nodes", generateNodeJSONArray(dto.getNodes()));
+		json.put("connections", generateConnectionJSONArray(dto.getConnections()));
+		writeAll(json.toJSONString(), file);
+	}
+	
+	private JSONArray generateNodeJSONArray(List<NodeDTO> dtos) {
+		JSONArray array = new JSONArray();
+		dtos.forEach(dto ->  {
+			JSONObject obj = new JSONObject();
+			obj.put("id", dto.getId());
+			obj.put("name", dto.getName());
+			obj.put("connections", dto.getConnections());
+			array.add(obj);
+		});
+		return array;
+	}
+	
+	private JSONArray generateConnectionJSONArray(List<ConnectionDTO> dtos) {
+		JSONArray array = new JSONArray();
+		dtos.forEach(dto -> {
+			JSONObject obj = new JSONObject();
+			obj.put("id", dto.getId());
+			obj.put("targetId", dto.getTargetId());
+			obj.put("weight", dto.getWeight());
+			array.add(obj);
+		});
+		return array;
+	}
+	
+	private String readAll(File file) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		StringBuilder content = new StringBuilder();
+		String line;
+		while((line = reader.readLine()) != null) {
+			content.append(line + "\n");
+		}
+		reader.close();
+		return content.toString();
+	}
+	
+	private void writeAll(final String string, final File file) throws FileNotFoundException {
+		PrintWriter writer = new PrintWriter(file);
+		writer.write(string);
+		writer.close();
+	}
+	
+	private Properties loadProperties(final File file) throws IOException, FileNotFoundException {
+		Reader reader = new FileReader(file);
+		Properties properties = new Properties();
+		properties.load(reader);
+		return properties;
+	}
+	
+	private void storeProperties(final Properties properties, final File file, final String comment) throws IOException {
+		Writer writer = new PrintWriter(file);
+		properties.store(writer, comment);
+		writer.close();
+	}
+}

@@ -1,9 +1,10 @@
-package ai.jbon.jbon;
+package ai.jbon.jbon.injector;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.nodes.Node;
 
 public class InjectionTask extends Thread {
@@ -21,10 +22,9 @@ public class InjectionTask extends Thread {
 		running = true;
 		while (running) {
 			if (!queue.isEmpty()) {
-				System.out.println("YESS");
 				inject();
 			}
-			
+
 			// TODO clean this shit -----------
 			try {
 				sleep(0, 1);
@@ -36,23 +36,33 @@ public class InjectionTask extends Thread {
 	}
 
 	private void inject() {
+		try {
+			List<Connection> connections = new ArrayList<Connection>();
+			queue.forEach(node -> {
+				List<Connection> outputs = node.pushOutput();
+				if (outputs != null) {
+					connections.addAll(outputs);
+				}
+			});
+			List<Node> targets = gatherTargetNodes(connections);
+			calcOutputs(targets);
+			resetQueue(targets);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+	}
 
-		List<Connection> connections = new ArrayList<Connection>();
-		// Node to Connection to next Node
-		queue.forEach(node -> {
-			if (!(node.pushOutput() == null)) {
-				connections.addAll(node.pushOutput());
-			}
-		});
-		// Calculate target Node values
-		List<Node> targets = gatherTargetNodes(connections);
-		targets.forEach(target -> {
-			target.calcOutput();
-		});
+	private void resetQueue(List<Node> targets) {
 		queue.clear();
 		queue.addAll(targets);
 	}
-
+	
+	private void calcOutputs(List<Node> targets) {
+		targets.forEach(target -> {
+			target.calcOutput();
+		});
+	}
+	
 	private List<Node> gatherTargetNodes(final List<Connection> connections) {
 		List<Node> targets = new ArrayList<Node>();
 		connections.forEach(connection -> {

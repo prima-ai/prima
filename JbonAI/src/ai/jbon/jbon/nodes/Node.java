@@ -5,30 +5,42 @@ import java.util.List;
 
 import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.functions.Function;
+import ai.jbon.jbon.functions.IdentityFunction;
 import ai.jbon.jbon.functions.SigmoidFunction;
 
 public class Node {
-
+	
+	private final String tag;
+	
 	protected float value;
+	private float bias;
 	private Function function;
 	protected List<Connection> connections;
 	private List<Float> valueBuffer;
 	
-	public Node(final List<Connection> connections) {
-		this.connections = connections;
+	public Node(String tag, Function function) {
+		this.tag = tag;
+		this.connections = new ArrayList<Connection>();
+		this.function = function;
 		valueBuffer = new ArrayList<Float>();
+		valueBuffer.add(bias);
+		function = new IdentityFunction();
 	}
 	
-	public Node() {
+	public Node(Function function) {
+		this.tag = "Node";
 		this.connections = new ArrayList<Connection>();
+		this.function = function;
 		valueBuffer = new ArrayList<Float>();
-		function = new SigmoidFunction();
+		valueBuffer.add(bias);
+		function = new IdentityFunction();
 	}
 	
 	// Calculate value of node
 	public void calcOutput() {
 		this.value = function.getOutput(valueBuffer);
 		valueBuffer.clear();
+		valueBuffer.add(bias);
 	}
 	
 	public List<Connection> pushOutput() {
@@ -38,7 +50,10 @@ public class Node {
 		return connections;
 	}
 	
-	// Stores the value in the valuebuffer
+	public Node generate(Function function) {
+		return new Node(tag, function);
+	}
+	
 	public void injectValue(final float value) {
 		this.valueBuffer.add(value);
 	}
@@ -47,7 +62,15 @@ public class Node {
 		connections.add(c);
 	}
 
+	public String getTag() {
+		return this.tag;
+	}
+	
 	public float getValue() {
 		return value;
+	}
+	
+	public List<Connection> getConnections(){
+		return this.connections;
 	}
 }

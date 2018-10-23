@@ -1,9 +1,11 @@
-package ai.jbon.jbon.example.inputNodes;
+package ai.jbon.jbon.inputNodes;
 
 import java.util.Scanner;
 
-import ai.jbon.jbon.Injector;
+import ai.jbon.jbon.functions.Function;
+import ai.jbon.jbon.injector.Injector;
 import ai.jbon.jbon.nodes.InputNode;
+import ai.jbon.jbon.nodes.Node;
 
 public class ConsoleInputNode extends InputNode{
 
@@ -11,8 +13,8 @@ public class ConsoleInputNode extends InputNode{
 	
 	private boolean active = true;
 	
-	public ConsoleInputNode(Injector injector) {
-		super(injector);
+	public ConsoleInputNode(Function function) {
+		super("ConsoleInputNode", function);
 		this.scanner = new Scanner(System.in);
 	}
 
@@ -23,9 +25,14 @@ public class ConsoleInputNode extends InputNode{
 	}
 
 	@Override
-	public void setup() {
+	public void start() {
 		while(active) {
 			getInputValue();
 		}
+	}
+
+	@Override
+	protected Node createInstance(Function function) {
+		return new ConsoleInputNode(function);
 	}
 }
