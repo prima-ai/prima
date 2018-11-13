@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import ai.jbon.jbon.Log;
 import ai.jbon.jbon.Network;
 import ai.jbon.jbon.ThreadConfig;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
@@ -26,9 +28,8 @@ import ai.jbon.jbon.data.dto.NetworkDTO;
 import ai.jbon.jbon.data.dto.NodeDTO;
 
 public class ResourceLoader {
-
-	private NetworkBuilder networkBuilder;
 	
+	private NetworkBuilder networkBuilder;
 	private JSONParser json;
 	
 	public ResourceLoader() {
@@ -151,5 +152,25 @@ public class ResourceLoader {
 		Writer writer = new PrintWriter(file);
 		properties.store(writer, comment);
 		writer.close();
+	}
+	
+	public List<File> getAllFilesFromDir(File directory){
+		List<File> files = new ArrayList<File>();
+		for(File file : directory.listFiles()) {
+			if(file.isDirectory()) {
+				files.addAll(getAllFilesFromDir(file));
+			}else {
+				files.add(file);
+			}
+		}
+		return files;
+	}
+	
+	public List<File> loadPluginFiles(){
+		List<File> files = getAllFilesFromDir(new File(""));
+		files.stream()
+			.filter(file -> file.getPath().endsWith(".jar"))
+			.collect(Collectors.toList());
+		return files;
 	}
 }

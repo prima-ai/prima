@@ -1,41 +1,47 @@
 package ai.jbon.jbon.data;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import ai.jbon.jbon.Log;
+import ai.jbon.jbon.exceptions.NodeGenerationException;
+import ai.jbon.jbon.exceptions.RegistryFailedException;
 import ai.jbon.jbon.functions.Function;
-import ai.jbon.jbon.nodes.InputNode;
 import ai.jbon.jbon.nodes.Node;
-import ai.jbon.jbon.nodes.OutputNode;
 
 public class Registry {
 
-	private static Map<String, Node> nodes = new HashMap<String, Node>();
-	
+	private static Map<String, Class<? extends Node>> nodes = new HashMap<String, Class<? extends Node>>();
 	private static Map<String, Function> functions = new HashMap<String, Function>();
 	
-	public static Function getFunction(String name) {
-		return functions.get(name);
+	public Node createNode(String name, String function) throws NodeGenerationException{
+		Node node;
+		try {
+			Constructor<? extends Node> c = nodes.get(name).getDeclaredConstructor(Function.class);
+			node = c.newInstance(functions.get(function));
+		} catch(Exception e) {
+			throw new NodeGenerationException(name);
+		}
+		return node;
 	}
 	
-	public static void registerNode(Node node) {
-		if(nodes.containsKey(node.getTag())) {
-			Log.warning("Node " + node.getTag()  + "was registered twice");
-		} else {
-			nodes.put(node.getTag(), node);
+	public void registerFunction(Class<? extends Function> function) throws RegistryFailedException {
+		try {
+			functions.put(function.getName(), createFunction(function));
+		} catch(Exception e) {
+			throw new RegistryFailedException(function, function.getName());
 		}
 	}
 	
-	public static void registerFunciton(String name, Function function) {
-		if(functions.containsKey(name)) {
-			Log.warning("Function " + name + "was registered twice");
-		}else {
-			functions.put(name, function);
+	public void registerNode(Class<? extends Node> node) throws RegistryFailedException {
+		try {
+			nodes.put(node.getName(), node);
+		} catch(Exception e) {
+			throw new RegistryFailedException(node, node.getName());
 		}
 	}
 	
-	public static Node generateNode(String name, Function function) {
-		return (Node) nodes.get(name).generate(function);
+	private Function createFunction(Class<? extends Function> function) throws InstantiationException, IllegalAccessException {
+		return function.newInstance();
 	}
 }

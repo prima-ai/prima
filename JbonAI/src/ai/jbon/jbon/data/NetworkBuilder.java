@@ -1,15 +1,20 @@
 package ai.jbon.jbon.data;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ai.jbon.jbon.Connection;
+import ai.jbon.jbon.Log;
 import ai.jbon.jbon.Network;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
 import ai.jbon.jbon.data.dto.NetworkDTO;
 import ai.jbon.jbon.data.dto.NodeDTO;
+import ai.jbon.jbon.functions.Function;
+import ai.jbon.jbon.functions.IdentityFunction;
 import ai.jbon.jbon.nodes.Node;
 
 public class NetworkBuilder {
@@ -62,8 +67,26 @@ public class NetworkBuilder {
 	private Map<NodeDTO, Node> generateNodes(final List<NodeDTO> dtos) {
 		Map<NodeDTO, Node> nodes = new HashMap<NodeDTO, Node>();
 		dtos.forEach(dto -> {
-			Node node = Registry.generateNode(dto.getName(), Registry.getFunction("identity"));
-			nodes.put(dto, node);
+			Constructor<?> constructor;
+			try {
+				constructor = Class.forName(dto.getName()).getDeclaredConstructor(Function.class);
+				Node node = (Node) constructor.newInstance(new IdentityFunction());
+				nodes.put(dto, node);
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		});
 		return nodes;
 	}
@@ -86,7 +109,7 @@ public class NetworkBuilder {
 		nodeRegistry.keySet().forEach(node -> {
 			List<Integer> connectionIds = parseConnectionList(connectionRegistry, node.getConnections());
 			int id = nodeRegistry.get(node);
-			NodeDTO dto = new NodeDTO(id, node.getTag(), connectionIds);
+			NodeDTO dto = new NodeDTO(id, node.getClass().getName(), connectionIds);
 			dtos.add(dto);
 		});
 		return dtos;

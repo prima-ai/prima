@@ -1,12 +1,14 @@
 package ai.jbon.jbon.nodes;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
 import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.functions.Function;
 import ai.jbon.jbon.functions.IdentityFunction;
-import ai.jbon.jbon.functions.SigmoidFunction;
 
 public class Node {
 	

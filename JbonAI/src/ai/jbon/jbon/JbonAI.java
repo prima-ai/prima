@@ -1,50 +1,72 @@
 package ai.jbon.jbon;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Scanner;
-
-import org.json.simple.parser.ParseException;
+import java.util.stream.Collectors;
 
 import ai.jbon.jbon.commands.Command;
 import ai.jbon.jbon.commands.EchoCommand;
 import ai.jbon.jbon.data.Registry;
 import ai.jbon.jbon.data.ResourceLoader;
-import ai.jbon.jbon.functions.Function;
+import ai.jbon.jbon.exceptions.LoadClassFromFileFailedException;
+import ai.jbon.jbon.exceptions.RegistryFailedException;
 import ai.jbon.jbon.functions.IdentityFunction;
 import ai.jbon.jbon.functions.SigmoidFunction;
 import ai.jbon.jbon.inputNodes.ConsoleInputNode;
-import ai.jbon.jbon.nodes.InputNode;
 import ai.jbon.jbon.nodes.Node;
-import ai.jbon.jbon.nodes.OutputNode;
 import ai.jbon.jbon.outputNodes.ConsoleOutputNode;
+import ai.jbon.jbon.data.ClassLoader;
 
 public class JbonAI {
 
-	private boolean running;
+	private static final File PLUGIN_DIR = new File("../plugins");
 	
 	private final Map<String, Command> commands = new HashMap<String, Command>();
-	
-	private NetworkThread threads;
+	private final Registry registry;
+	private final List<NetworkThread> networkThreads;
 	private final Scanner scanner;
 	
+	private boolean running;
+	
 	public JbonAI() {
+		this.registry = new Registry();
+		this.networkThreads = new ArrayList<>();
 		this.scanner = new Scanner(System.in);
 		initCommands();
-		initFunctions();
-		initNodes();
+		try {
+			initFunctions(registry);
+			initNodes(registry);
+		} catch(RegistryFailedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String args[]) {
 		JbonAI ai = new JbonAI();
 		
+		if(!PLUGIN_DIR.exists()) {
+			PLUGIN_DIR.mkdir();
+		}
+		ResourceLoader loader = new ResourceLoader();
+		List<File> plugins = loader.getAllFilesFromDir(PLUGIN_DIR).stream()
+				.filter(file -> file.getPath().endsWith(".jar"))
+				.collect(Collectors.toList());
+		ClassLoader classLoader = new ClassLoader();
+		plugins.forEach(plugin -> {
+			try {
+				classLoader.loadClassesFromJar(plugin);
+			} catch (LoadClassFromFileFailedException e) {
+				e.printStackTrace();
+			}
+		});
+		
+		
+		/*
 		Function defaultFunc = Registry.getFunction("identity");
 		InputNode input = (InputNode) Registry.generateNode("ConsoleInputNode", defaultFunc);
 		Node node = Registry.generateNode("Node", defaultFunc);
@@ -57,22 +79,14 @@ public class JbonAI {
 		nodes.add(input);
 		nodes.add(node);
 		nodes.add(output);
-		
 		Network network = new Network(nodes);
+		*/
 		
-		ResourceLoader loader = new ResourceLoader();
-		try {
+		/*try {
 			loader.storeNetwork(network, new File("C:\\Users\\John Cena\\Desktop\\network.ann"));
-			Network n = loader.loadNetwork(new File("C:\\Users\\John Cena\\Desktop\\network.ann"));
-			loader.storeNetwork(n, new File("C:\\Users\\John Cena\\Desktop\\network2.ann"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//ai.run();
+		}*/
 	}
 	
 	public void run() {
@@ -96,15 +110,15 @@ public class JbonAI {
 		commands.put("echo", new EchoCommand());
 	}
 	
-	private void initFunctions() {
-		Registry.registerFunciton("sigmoid", new SigmoidFunction());
-		Registry.registerFunciton("identity", new IdentityFunction());
+	private void initFunctions(Registry registry) throws RegistryFailedException {
+		registry.registerFunction(SigmoidFunction.class);
+		registry.registerFunction(IdentityFunction.class);
 	}
 	
-	private void initNodes() {
-		Registry.registerNode(new ConsoleInputNode(null));
-		Registry.registerNode(new Node(null));
-		Registry.registerNode(new ConsoleOutputNode(null));
+	private void initNodes(Registry registry) throws RegistryFailedException {
+		registry.registerNode(ConsoleInputNode.class);
+		registry.registerNode(Node.class);
+		registry.registerNode(ConsoleOutputNode.class);
 	}
 	
 	private String readConsole() {
