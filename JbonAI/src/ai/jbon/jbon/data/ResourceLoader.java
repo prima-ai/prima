@@ -166,8 +166,8 @@ public class ResourceLoader {
 		return files;
 	}
 	
-	public List<File> loadPluginFiles(){
-		List<File> files = getAllFilesFromDir(new File(""));
+	public List<File> loadPluginFiles(File pluginDir){
+		List<File> files = getAllFilesFromDir(pluginDir);
 		files.stream()
 			.filter(file -> file.getPath().endsWith(".jar"))
 			.collect(Collectors.toList());

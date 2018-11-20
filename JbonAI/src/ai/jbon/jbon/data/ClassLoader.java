@@ -2,6 +2,7 @@ package ai.jbon.jbon.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -14,25 +15,33 @@ import ai.jbon.jbon.exceptions.LoadClassFromFileFailedException;
 
 public class ClassLoader {
 	
-	public List<Class<?>> loadClassesFromJar(File file) throws LoadClassFromFileFailedException{
+	public List<Class<?>> loadClassesFromJar(File file) {
+		List<Class<?>> classes = new ArrayList<>();
 		try {
-		JarFile jar = new JarFile(file);
-		URL[] urls = {new URL("jar:file:" + file.getAbsolutePath() + "!/")}; 
-		URLClassLoader loader = new URLClassLoader(urls);
-		return loadAllJarClasses(jar.entries(), loader);
+			JarFile jar = new JarFile(file);
+			URLClassLoader loader = createClassLoader(file);
+			classes.addAll(loadAllJarClasses(jar, loader));
 		} catch (Exception e) {
-			throw new LoadClassFromFileFailedException(file);
+			new LoadClassFromFileFailedException(file).printStackTrace();
 		}
+		return classes;
 	}
 	
-	private List<Class<?>> loadAllJarClasses(Enumeration<JarEntry> entries, URLClassLoader loader) throws ClassNotFoundException {
+	private URLClassLoader createClassLoader(File file) throws MalformedURLException {
+		URL[] urls = {new URL("jar:file:" + file.getAbsolutePath() + "!/")}; 
+		return new URLClassLoader(urls);
+	}
+	
+	private List<Class<?>> loadAllJarClasses(JarFile jar, URLClassLoader loader) throws ClassNotFoundException, IOException {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
+		Enumeration<JarEntry> entries = jar.entries();
 		while (entries.hasMoreElements()) {
 			JarEntry jarEntry = (JarEntry) entries.nextElement();
 			if(!jarEntry.isDirectory() && jarEntry.getName().endsWith(".class")) {
 				classes.add(loader.loadClass(parseClassName(jarEntry.getName())));
 			}
 		}
+		jar.close();
 		return classes;
 	}
 	

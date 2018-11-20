@@ -14,36 +14,36 @@ import ai.jbon.jbon.commands.EchoCommand;
 import ai.jbon.jbon.data.Registry;
 import ai.jbon.jbon.data.ResourceLoader;
 import ai.jbon.jbon.exceptions.LoadClassFromFileFailedException;
+import ai.jbon.jbon.exceptions.NoRegistryEntryException;
 import ai.jbon.jbon.exceptions.RegistryFailedException;
 import ai.jbon.jbon.functions.IdentityFunction;
 import ai.jbon.jbon.functions.SigmoidFunction;
 import ai.jbon.jbon.inputNodes.ConsoleInputNode;
 import ai.jbon.jbon.nodes.Node;
 import ai.jbon.jbon.outputNodes.ConsoleOutputNode;
+import ai.jbon.jbon.plugin.Plugin;
 import ai.jbon.jbon.data.ClassLoader;
 
 public class JbonAI {
 
 	private static final File PLUGIN_DIR = new File("../plugins");
 	
-	private final Map<String, Command> commands = new HashMap<String, Command>();
-	private final Registry registry;
-	private final List<NetworkThread> networkThreads;
-	private final Scanner scanner;
+	private final Registry registry = new Registry();
+	private final ResourceLoader resourceLoader = new ResourceLoader();
+	private final ClassLoader classLoader = new ClassLoader();
+	private final List<NetworkThread> networkThreads = new ArrayList<>();
+	private final List<Plugin> plugins = new ArrayList<>();
+	private final Scanner scanner = new Scanner(System.in);
 	
 	private boolean running;
 	
 	public JbonAI() {
-		this.registry = new Registry();
-		this.networkThreads = new ArrayList<>();
-		this.scanner = new Scanner(System.in);
+		initPlugins();
+		initFunctions();
+		initNodes();
 		initCommands();
-		try {
-			initFunctions(registry);
-			initNodes(registry);
-		} catch(RegistryFailedException e) {
-			e.printStackTrace();
-		}
+		runPlugins();
+		unloadPlugins();
 	}
 	
 	public static void main(String args[]) {
@@ -52,19 +52,8 @@ public class JbonAI {
 		if(!PLUGIN_DIR.exists()) {
 			PLUGIN_DIR.mkdir();
 		}
-		ResourceLoader loader = new ResourceLoader();
-		List<File> plugins = loader.getAllFilesFromDir(PLUGIN_DIR).stream()
-				.filter(file -> file.getPath().endsWith(".jar"))
-				.collect(Collectors.toList());
-		ClassLoader classLoader = new ClassLoader();
-		plugins.forEach(plugin -> {
-			try {
-				classLoader.loadClassesFromJar(plugin);
-			} catch (LoadClassFromFileFailedException e) {
-				e.printStackTrace();
-			}
-		});
 		
+		ai.loadPlugins();
 		
 		/*
 		Function defaultFunc = Registry.getFunction("identity");
@@ -99,6 +88,37 @@ public class JbonAI {
 		}
 	}
 	
+	public void loadPlugins() {
+		List<File> pluginJars = resourceLoader.loadPluginFiles(PLUGIN_DIR);
+		pluginJars.forEach(jar -> {
+			List<Class<?>> classes = classLoader.loadClassesFromJar(jar);
+			findPluginClasses(classes).forEach(c -> {
+				System.out.println(c.getName());
+				addPluginClass((Class<? extends Plugin>) c);
+			});
+		});
+	}
+	
+	private void addPluginClass(Class<? extends Plugin> c) {
+		try {
+			plugins.add(c.newInstance());
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private List<Class<? extends Plugin>> findPluginClasses(List<Class<?>> classes){
+		List<Class<? extends Plugin>> pluginClasses = new ArrayList<>();
+		classes.stream()
+			.filter(c -> Plugin.class.isAssignableFrom(c))
+			.forEach(c -> {
+				pluginClasses.add((Class<? extends Plugin>) c);
+			});
+		return pluginClasses;
+	}
+	
 	private List<String> readArgs(String input) {
 		List<String> args = new ArrayList<String>();
 		args.addAll(Arrays.asList(input.split(" ")));
@@ -106,19 +126,40 @@ public class JbonAI {
 		return args;
 	}
 	
+	private void initPlugins() {
+		plugins.forEach(plugin -> {
+			plugin.load();
+		});
+	}
+	
 	private void initCommands() {
-		commands.put("echo", new EchoCommand());
+		plugins.forEach(plugin -> {
+			plugin.registerCommands(registry);
+		});
 	}
 	
-	private void initFunctions(Registry registry) throws RegistryFailedException {
-		registry.registerFunction(SigmoidFunction.class);
-		registry.registerFunction(IdentityFunction.class);
+	private void initFunctions() {
+		plugins.forEach(plugin -> {
+			plugin.registerFunctions(registry);
+		});
 	}
 	
-	private void initNodes(Registry registry) throws RegistryFailedException {
-		registry.registerNode(ConsoleInputNode.class);
-		registry.registerNode(Node.class);
-		registry.registerNode(ConsoleOutputNode.class);
+	private void initNodes() {
+		plugins.forEach(plugin -> {
+			plugin.registerNodes(registry);
+		});
+	}
+	
+	private void runPlugins() {
+		plugins.forEach(plugin -> {
+			plugin.run();
+		});
+	}
+	
+	private void unloadPlugins() {
+		plugins.forEach(plugin -> {
+			plugin.unload();
+		});
 	}
 	
 	private String readConsole() {
@@ -127,10 +168,10 @@ public class JbonAI {
 	}
 	
 	private void runCommand(String cmd, List<String> args) {
-		if(commands.containsKey(cmd)) {
-			commands.get(cmd).execute(args);
-		}else {
-			Log.info("Unknown command");
+		try {
+			registry.getCommand(cmd).execute(args);
+		} catch (NoRegistryEntryException e) {
+			e.printStackTrace();
 		}
 	}
 }

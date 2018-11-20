@@ -10,8 +10,7 @@ public class EchoCommand extends Command{
 	private static final int MESSAGE = 0;
 	
 	public EchoCommand() {
-		super("echo <Message>", 
-				"Prints the given text to the console");
+		super("echo", "echo <Message>", "Prints the given text to the console");
 	}
 
 	@Override
