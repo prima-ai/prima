@@ -8,8 +8,11 @@ import ai.jbon.jbon.injector.Injector;
 import ai.jbon.jbon.nodes.InputNode;
 import ai.jbon.jbon.nodes.Node;
 import ai.jbon.jbon.nodes.OutputNode;
+import ai.jbon.jbon.util.Log;
 
 public class Network {
+	
+	private final Log log = new Log(getClass());
 	
 	private List<Node> nodes;
 	private List<InputNode> inputNodes;
@@ -28,11 +31,11 @@ public class Network {
 	}
 	
 	public void run() {
-		Log.info("Starting up network");
+		log.info("Starting up network");
 		setupInputNodes();
-		Log.info("Set up Inputnodes");
+		log.info("Set up Inputnodes");
 		injector.run();
-		Log.info("Started Injector");
+		log.info("Started Injector");
 	}
 	
 	private void setupInputNodes() {

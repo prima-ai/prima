@@ -1,21 +1,27 @@
 package ai.jbon.jbon.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import ai.jbon.jbon.JbonAI;
-import ai.jbon.jbon.Log;
+import ai.jbon.jbon.util.Log;
 
 public class EchoCommand extends Command{
 
-	private static final int MESSAGE = 0;
+	private static final String MESSAGE = "message";
+	
+	private final Log log = new Log(getClass());
 	
 	public EchoCommand() {
-		super("echo", "echo <Message>", "Prints the given text to the console");
+		super("echo", "Prints a message in the console", Arrays.asList(MESSAGE), new ArrayList<String>());
 	}
 
 	@Override
-	public void execute(List<String> args) {
-		Log.info(args.get(MESSAGE));
+	public void execute(Map<String, String> args) {
+		String message = args.get(MESSAGE);
+		log.info(message);
 	}
 
 }

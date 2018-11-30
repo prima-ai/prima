@@ -20,12 +20,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import ai.jbon.jbon.Log;
 import ai.jbon.jbon.Network;
 import ai.jbon.jbon.ThreadConfig;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
 import ai.jbon.jbon.data.dto.NetworkDTO;
 import ai.jbon.jbon.data.dto.NodeDTO;
+import ai.jbon.jbon.util.Log;
 
 public class ResourceLoader {
 	

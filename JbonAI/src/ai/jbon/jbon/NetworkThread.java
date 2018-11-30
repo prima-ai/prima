@@ -25,4 +25,8 @@ public class NetworkThread extends Thread{
 	private void setup() {
 		setPriority(config.priority);
 	}
+	
+	public Network getNetwork() {
+		return this.network;
+	}
 }

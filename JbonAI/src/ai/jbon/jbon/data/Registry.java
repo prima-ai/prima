@@ -65,4 +65,10 @@ public class Registry {
 			throw new RegistryFailedException(command.getClass(), command.getCmd());
 		}
 	}
+
+	public Map<String, Class<? extends Node>> getNodes() { return nodes; }
+
+	public Map<String, Function> getFunctions() { return functions; }
+
+	public Map<String, Command> getCommands() { return commands; }
 }

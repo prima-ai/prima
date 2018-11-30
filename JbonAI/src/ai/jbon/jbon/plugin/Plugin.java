@@ -1,5 +1,6 @@
 package ai.jbon.jbon.plugin;
 
+import ai.jbon.jbon.JbonAI;
 import ai.jbon.jbon.data.Registry;
 
 public abstract class Plugin {
@@ -20,7 +21,7 @@ public abstract class Plugin {
 	
 	public abstract void registerCommands(Registry registry);
 	
-	public abstract void load();
+	public abstract void init(JbonAI ai);
 	
 	public abstract void unload();
 	

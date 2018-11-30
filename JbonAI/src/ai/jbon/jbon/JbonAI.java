@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import ai.jbon.jbon.commands.Command;
 import ai.jbon.jbon.commands.EchoCommand;
+import ai.jbon.jbon.commands.HelpCommand;
 import ai.jbon.jbon.data.Registry;
 import ai.jbon.jbon.data.ResourceLoader;
 import ai.jbon.jbon.exceptions.LoadClassFromFileFailedException;
@@ -34,10 +35,17 @@ public class JbonAI {
 	private final List<NetworkThread> networkThreads = new ArrayList<>();
 	private final List<Plugin> plugins = new ArrayList<>();
 	private final Scanner scanner = new Scanner(System.in);
+	private final Prompt prompt = new Prompt(registry);
 	
 	private boolean running;
 	
 	public JbonAI() {
+		try {
+			registry.registerCommand(new EchoCommand());
+			registry.registerCommand(new HelpCommand(registry));
+		} catch (RegistryFailedException e) {
+			e.printStackTrace();
+		}
 		initPlugins();
 		initFunctions();
 		initNodes();
@@ -54,6 +62,7 @@ public class JbonAI {
 		}
 		
 		ai.loadPlugins();
+		ai.run();
 		
 		/*
 		Function defaultFunc = Registry.getFunction("identity");
@@ -81,10 +90,8 @@ public class JbonAI {
 	public void run() {
 		running =  true;
 		while(running) {
-			String input = readConsole();
-			String cmd = input.split(" ")[0];
-			List<String> args = readArgs(input);
-			runCommand(cmd, args);
+			String cmd = readConsole();
+			prompt.runCmd(cmd);
 		}
 	}
 	
@@ -118,17 +125,10 @@ public class JbonAI {
 			});
 		return pluginClasses;
 	}
-	
-	private List<String> readArgs(String input) {
-		List<String> args = new ArrayList<String>();
-		args.addAll(Arrays.asList(input.split(" ")));
-		args.remove(0);
-		return args;
-	}
-	
+		
 	private void initPlugins() {
 		plugins.forEach(plugin -> {
-			plugin.load();
+			plugin.init(this);
 		});
 	}
 	
@@ -167,11 +167,7 @@ public class JbonAI {
 		return scanner.nextLine();
 	}
 	
-	private void runCommand(String cmd, List<String> args) {
-		try {
-			registry.getCommand(cmd).execute(args);
-		} catch (NoRegistryEntryException e) {
-			e.printStackTrace();
-		}
+	public List<NetworkThread> getThreads(){
+		return this.networkThreads;
 	}
 }

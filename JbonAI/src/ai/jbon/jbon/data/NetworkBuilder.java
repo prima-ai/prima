@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import ai.jbon.jbon.Connection;
-import ai.jbon.jbon.Log;
 import ai.jbon.jbon.Network;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
 import ai.jbon.jbon.data.dto.NetworkDTO;
@@ -16,6 +15,7 @@ import ai.jbon.jbon.data.dto.NodeDTO;
 import ai.jbon.jbon.functions.Function;
 import ai.jbon.jbon.functions.IdentityFunction;
 import ai.jbon.jbon.nodes.Node;
+import ai.jbon.jbon.util.Log;
 
 public class NetworkBuilder {
 
