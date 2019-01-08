@@ -6,18 +6,14 @@ import ai.jbon.jbon.nodes.OutputNode;
 
 public class ConsoleOutputNode extends OutputNode{
 	
+	private static final String TAG = "consolein";
+	
 	public ConsoleOutputNode(Function function) {
-		super("ConsoleOutputNode", function);
+		super(TAG, function);
 	}
 
 	@Override
 	public void execute(float value) {
 		System.out.println("Output: " + value);
 	}
-
-	@Override
-	protected Node createInstance(Function function) {
-		return new ConsoleOutputNode(function);
-	}
-
 }

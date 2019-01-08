@@ -2,7 +2,6 @@ package ai.jbon.jbon.nodes;
 
 import java.util.List;
 
-import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.functions.Function;
 
 public abstract class OutputNode extends Node{
@@ -13,13 +12,6 @@ public abstract class OutputNode extends Node{
 	
 	public OutputNode(String tag, Function function) {
 		super(tag, function);
-	}
-	
-	protected abstract Node createInstance(Function function);
-	
-	@Override
-	public Node generate(Function function) {
-		return createInstance(function);
 	}
 	
 	@Override

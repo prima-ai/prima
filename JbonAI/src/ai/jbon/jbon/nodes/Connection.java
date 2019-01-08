@@ -1,6 +1,4 @@
-package ai.jbon.jbon;
-
-import ai.jbon.jbon.nodes.Node;
+package ai.jbon.jbon.nodes;
 
 public class Connection {
 
@@ -18,18 +16,15 @@ public class Connection {
         weight = w;
     }
     
-    // Triggers the neuron target calculate its output and push it
     public void push(){
     	target.pushOutput();
     }
     
-    // Injects a value intarget the target node valuebuffer
     public void injectValue(final float value) {
     	this.value = value * this.weight;
     	target.injectValue(this.value);
     }
     
-    // Changing the weight of the connection
     public void adjustWeight(float deltaWeight) {
         weight += deltaWeight;
     }

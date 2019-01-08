@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,52 +20,39 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import ai.jbon.jbon.Network;
-import ai.jbon.jbon.ThreadConfig;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
 import ai.jbon.jbon.data.dto.NetworkDTO;
 import ai.jbon.jbon.data.dto.NodeDTO;
-import ai.jbon.jbon.util.Log;
 
 public class ResourceLoader {
 	
 	private NetworkBuilder networkBuilder;
 	private JSONParser json;
 	
-	public ResourceLoader() {
-		this.networkBuilder = new NetworkBuilder();
+	public ResourceLoader(Registry registry) {
+		this.networkBuilder = new NetworkBuilder(registry);
 		json = new JSONParser();
-	}
-	
-	public void storeThreadConfig(final ThreadConfig config, final File file) throws IOException {
-		Properties properties = config.toProperties();
-		this.storeProperties(properties, file, "JbonAI ThreadConfig");
-	}
-	
-	public ThreadConfig loadThreadConfig(final File file) throws FileNotFoundException, IOException {
-		Properties properties = loadProperties(file);
-		ThreadConfig config = new ThreadConfig();
-		config.load(properties);
-		return config;
 	}
 
 	public Network loadNetwork(final File file) throws IOException, ParseException {
-		return networkBuilder.assemble(loadNetworkDTO(file));
+		return networkBuilder.assemble(file, loadNetworkDTO(file));
 	}
 	
 	public NetworkDTO loadNetworkDTO(final File file) throws IOException, ParseException {
 		String content = readAll(file);
 		JSONObject network = (JSONObject) this.json.parse(content);
+		String name = (String) network.get("name");
 		JSONArray nodes = (JSONArray) network.get("nodes");
 		JSONArray connections = (JSONArray) network.get("connections");
-		return new NetworkDTO(parseNodes(nodes), parseConnections(connections));
+		return new NetworkDTO(name, parseNodes(nodes), parseConnections(connections));
 	}
 	
 	private List<NodeDTO> parseNodes(JSONArray json){
 		List<NodeDTO> dtos = new ArrayList<NodeDTO>();
 		Iterator<JSONObject> iterator = json.iterator();
 		iterator.forEachRemaining(obj -> {
-			NodeDTO dto = new NodeDTO((int) (long) obj.get("id"), (String) obj.get("name"), 
-					parseConnectionIdList(((JSONArray) obj.get("connections"))));
+			NodeDTO dto = new NodeDTO((int) (long) obj.get("id"), (String) obj.get("name"),
+					(String) obj.get("function"), parseConnectionIdList(((JSONArray) obj.get("connections"))));
 			dtos.add(dto);
 		});
 		return dtos;
@@ -91,13 +77,14 @@ public class ResourceLoader {
 		return dtos;
 	}
 	
-	public void storeNetwork(final Network network, final File file) throws FileNotFoundException {
+	public void storeNetwork(final Network network) throws FileNotFoundException {
 		NetworkDTO dto = networkBuilder.disassemble(network);
 		JSONObject json = new JSONObject();
 		JSONArray array = new JSONArray();
+		json.put("name", dto.getName());
 		json.put("nodes", generateNodeJSONArray(dto.getNodes()));
 		json.put("connections", generateConnectionJSONArray(dto.getConnections()));
-		writeAll(json.toJSONString(), file);
+		writeAll(json.toJSONString(), network.getFile());
 	}
 	
 	private JSONArray generateNodeJSONArray(List<NodeDTO> dtos) {
@@ -106,6 +93,7 @@ public class ResourceLoader {
 			JSONObject obj = new JSONObject();
 			obj.put("id", dto.getId());
 			obj.put("name", dto.getName());
+			obj.put("function", dto.getFunction());
 			obj.put("connections", dto.getConnections());
 			array.add(obj);
 		});

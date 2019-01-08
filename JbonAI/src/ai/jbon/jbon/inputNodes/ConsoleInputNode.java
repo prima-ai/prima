@@ -9,12 +9,13 @@ import ai.jbon.jbon.nodes.Node;
 
 public class ConsoleInputNode extends InputNode{
 
-	private Scanner scanner;
+	private static final String TAG = "consolein";
 	
+	private Scanner scanner;
 	private boolean active = true;
 	
 	public ConsoleInputNode(Function function) {
-		super("ConsoleInputNode", function);
+		super(TAG, function);
 		this.scanner = new Scanner(System.in);
 	}
 
@@ -29,10 +30,5 @@ public class ConsoleInputNode extends InputNode{
 		while(active) {
 			getInputValue();
 		}
-	}
-
-	@Override
-	protected Node createInstance(Function function) {
-		return new ConsoleInputNode(function);
 	}
 }

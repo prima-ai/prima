@@ -13,13 +13,6 @@ public abstract class InputNode extends Node{
 	
 	protected abstract void start();
 	
-	protected abstract Node createInstance(Function function);
-	
-	@Override
-	public Node generate(Function function) {
-		return createInstance(function);
-	}
-	
 	public void setup(Injector injector) {
 		this.injector = injector;
 		start();

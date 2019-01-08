@@ -1,5 +1,6 @@
 package ai.jbon.jbon.data;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -7,23 +8,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ai.jbon.jbon.Connection;
 import ai.jbon.jbon.Network;
 import ai.jbon.jbon.data.dto.ConnectionDTO;
 import ai.jbon.jbon.data.dto.NetworkDTO;
 import ai.jbon.jbon.data.dto.NodeDTO;
 import ai.jbon.jbon.functions.Function;
 import ai.jbon.jbon.functions.IdentityFunction;
+import ai.jbon.jbon.nodes.Connection;
 import ai.jbon.jbon.nodes.Node;
 import ai.jbon.jbon.util.Log;
 
 public class NetworkBuilder {
 
-	public Network assemble(NetworkDTO dto) {
+	private final Registry registry;
+	
+	public NetworkBuilder(Registry registry) {
+		this.registry = registry;
+	}
+	
+	public Network assemble(File file, NetworkDTO dto) {
 		Map<NodeDTO, Node> nodeRegistry = generateNodes(dto.getNodes());
 		Map<Integer, Connection> connections = generateConnections(dto.getConnections(), nodeRegistry);
 		List<Node> nodes = connectNodes(nodeRegistry, connections);
-		return new Network(nodes);
+		return new Network(file, dto.getName(), nodes);
 	}
 
 	public NetworkDTO disassemble(final Network network) {
@@ -32,7 +39,7 @@ public class NetworkBuilder {
 		Map<Connection, Integer> connectionRegistry = identifyConnections(nodes);
 		List<ConnectionDTO> connectionDTOs = generateConnectionDTOs(nodeRegistry, connectionRegistry);
 		List<NodeDTO> nodeDTOs = generateNodeDTOs(nodeRegistry, connectionRegistry);
-		return new NetworkDTO(nodeDTOs, connectionDTOs);
+		return new NetworkDTO(network.getName(), nodeDTOs, connectionDTOs);
 	}
 
 	public List<Node> connectNodes(final Map<NodeDTO, Node> nodeRegistry, final Map<Integer, Connection> connections){
@@ -45,17 +52,13 @@ public class NetworkBuilder {
 	}
 
 	private Node findConnectionTarget(ConnectionDTO dto, Map<NodeDTO, Node> nodeRegistry) {
-		for(NodeDTO nodeDTO : nodeRegistry.keySet()) {
-			if(nodeDTO.getId() == dto.getId()) {
-				return nodeRegistry.get(nodeDTO);
-			}
-		}
-		return null;
+		return nodeRegistry.entrySet().stream()
+				.filter(entry -> entry.getKey().getId() == dto.getTargetId()).findAny().get().getValue();
 	}
 	
 	private Map<Integer, Connection> generateConnections(final List<ConnectionDTO> dtos,
 			final Map<NodeDTO, Node> nodeRegistry) {
-		Map<Integer, Connection> connections = new HashMap<Integer, Connection>();
+		Map<Integer, Connection> connections = new HashMap<>();
 		dtos.forEach(dto -> {
 			Node target = findConnectionTarget(dto, nodeRegistry);
 			Connection connection = new Connection(target, dto.getWeight());
@@ -70,21 +73,9 @@ public class NetworkBuilder {
 			Constructor<?> constructor;
 			try {
 				constructor = Class.forName(dto.getName()).getDeclaredConstructor(Function.class);
-				Node node = (Node) constructor.newInstance(new IdentityFunction());
+				Node node = (Node) constructor.newInstance(registry.getFunction(dto.getFunction()));
 				nodes.put(dto, node);
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -109,7 +100,7 @@ public class NetworkBuilder {
 		nodeRegistry.keySet().forEach(node -> {
 			List<Integer> connectionIds = parseConnectionList(connectionRegistry, node.getConnections());
 			int id = nodeRegistry.get(node);
-			NodeDTO dto = new NodeDTO(id, node.getClass().getName(), connectionIds);
+			NodeDTO dto = new NodeDTO(id, node.getClass().getName(), node.getFunction().getClass().getName(), connectionIds);
 			dtos.add(dto);
 		});
 		return dtos;

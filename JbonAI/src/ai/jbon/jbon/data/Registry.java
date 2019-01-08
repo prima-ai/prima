@@ -18,6 +18,8 @@ public class Registry {
 	private static final Map<String, Command> commands = new HashMap<String, Command>();
 	
 	public Node createNode(String name, String function) throws NodeGenerationException {
+		if(functions.containsKey(function) && nodes.containsKey(name)) {
+		}
 		try {
 			Constructor<? extends Node> c = nodes.get(name).getDeclaredConstructor(Function.class);
 			return c.newInstance(functions.get(function));

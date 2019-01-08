@@ -1,12 +1,13 @@
 package ai.jbon.jbon.functions;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class SigmoidFunction extends Function{
+public class SigmoidFunction implements Function{
 
+	private static final String TAG = "sigmoid";
+	
 	@Override
-	public float getOutput(List<Float> values) {
+	public float apply(List<Float> values) {
 		float x = 0;
 		for(float value : values){
 			x += value;
@@ -14,4 +15,8 @@ public class SigmoidFunction extends Function{
 		return 1.0f/(1.0f+(float)Math.exp(-x));
 	}
 
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 }

@@ -6,30 +6,29 @@ import java.util.Date;
 
 public class Log {
 
-	private final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("hh:mm:ss:SSSS");
-	private final String initiator;
+	private static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("hh:mm:ss:SSSS");
 	
-	public Log(Class<?> c) {
-		initiator = c.getSimpleName();
-	}
-	
-	public void write(final String message) {
+	public static void writeLine(final String message) {
 		System.out.println(message);
 	}
 	
-	public void info(final String message) {
-		System.out.println(now() + " [INFO] " + initiator + ": " + message);
+	public static void write(final String message) {
+		System.out.print(message);
 	}
 	
-	public void error(final String message) {
-		System.out.println(now() + " [ERROR] " + initiator + ": " + message);
+	public static void info(final String message) {
+		System.out.println(now() + " [INFO]: " + message);
 	}
 	
-	public void warning(final String message) {
-		System.out.println(now() + " [WARNING] " + initiator + ": " + message);
+	public static void error(final String message) {
+		System.out.println(now() + " [ERROR]: " + message);
 	}
 	
-	private String now() {
+	public static void warning(final String message) {
+		System.out.println(now() + " [WARNING]: " + message);
+	}
+	
+	private static String now() {
 		return DATEFORMAT.format(new Date());
 	}
 }

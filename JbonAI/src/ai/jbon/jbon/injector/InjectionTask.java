@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import ai.jbon.jbon.Connection;
+import ai.jbon.jbon.nodes.Connection;
 import ai.jbon.jbon.nodes.Node;
 
 public class InjectionTask extends Thread {

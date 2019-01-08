@@ -2,7 +2,9 @@ package ai.jbon.jbon.functions;
 
 import java.util.List;
 
-public abstract class Function {
+public interface Function {
 	
-	public abstract float getOutput(List<Float> values);
+	public abstract float apply(List<Float> values);
+	
+	public abstract String getTag();
 }
