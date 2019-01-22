@@ -17,7 +17,7 @@ import ai.jbon.jbon.commands.HelpCommand;
 import ai.jbon.jbon.commands.NetworkCommand;
 import ai.jbon.jbon.commands.SaveCommand;
 import ai.jbon.jbon.commands.UseCommand;
-import ai.jbon.jbon.commands.StartCommand;
+import ai.jbon.jbon.commands.RunCommand;
 import ai.jbon.jbon.commands.TestCommand;
 import ai.jbon.jbon.commands.create.CreateCommand;
 import ai.jbon.jbon.commands.delete.DeleteCommand;
@@ -48,13 +48,12 @@ public class JbonAI {
 
 	public static final String NETWORK_EXTENSION = "network";
 	
-	private final Registry registry = new Registry();
-	private final ResourceLoader resourceLoader = new ResourceLoader(registry);
+	private final ResourceLoader resourceLoader = new ResourceLoader();
 	private final ClassLoader classLoader = new ClassLoader();
 	private final List<Network> networks = new ArrayList<>();
 	private final List<NetworkImage> images = new ArrayList<>();
 	private final List<Plugin> plugins = new ArrayList<>();
-	private final Prompt prompt = new Prompt(registry);
+	private final Prompt prompt = new Prompt();
 	
 	private Network selectedNetwork;
 	private NetworkImage selectedImage;
@@ -62,24 +61,24 @@ public class JbonAI {
 	public JbonAI() {
 		Log.writeLine(BRAND);
 		try {
-			registry.registerCommand(new EchoCommand());
-			registry.registerCommand(new TestCommand());
-			registry.registerCommand(new HelpCommand(registry));
-			registry.registerCommand(new CreateCommand(this));
-			registry.registerCommand(new NetworkCommand(this));
-			registry.registerCommand(new UseCommand(this));
-			registry.registerCommand(new BuildCommand(this));
-			registry.registerCommand(new StartCommand(this));
-			registry.registerCommand(new SaveCommand(this));
-			registry.registerCommand(new DeleteCommand(this));
-			registry.registerCommand(new ExitCommand(this));
-			registry.registerCommand(new FunctionCommand(this));
-			registry.registerCommand(new DuplicateCommand(this));
-			registry.registerNode(ConsoleInputNode.class);
-			registry.registerNode(ConsoleOutputNode.class);
-			registry.registerNode(PositiveInputNode.class);
-			registry.registerNode(Node.class);
-			registry.registerFunction(new IdentityFunction());
+			Registry.registerCommand(new EchoCommand());
+			Registry.registerCommand(new TestCommand());
+			Registry.registerCommand(new HelpCommand());
+			Registry.registerCommand(new CreateCommand(this));
+			Registry.registerCommand(new NetworkCommand(this));
+			Registry.registerCommand(new UseCommand(this));
+			Registry.registerCommand(new BuildCommand(this));
+			Registry.registerCommand(new RunCommand(this));
+			Registry.registerCommand(new SaveCommand(this));
+			Registry.registerCommand(new DeleteCommand(this));
+			Registry.registerCommand(new ExitCommand(this));
+			Registry.registerCommand(new FunctionCommand());
+			Registry.registerCommand(new DuplicateCommand(this));
+			Registry.registerNode(ConsoleInputNode.class);
+			Registry.registerNode(ConsoleOutputNode.class);
+			Registry.registerNode(PositiveInputNode.class);
+			Registry.registerNode(Node.class);
+			Registry.registerFunction(new IdentityFunction());
 		} catch (RegistryFailedException e) {
 			e.printStackTrace();
 		}
@@ -183,19 +182,19 @@ public class JbonAI {
 
 	private void initCommands() {
 		plugins.forEach(plugin -> {
-			plugin.registerCommands(registry);
+			plugin.registerCommands();
 		});
 	}
 
 	private void initFunctions() {
 		plugins.forEach(plugin -> {
-			plugin.registerFunctions(registry);
+			plugin.registerFunctions();
 		});
 	}
 
 	private void initNodes() {
 		plugins.forEach(plugin -> {
-			plugin.registerNodes(registry);
+			plugin.registerNodes();
 		});
 	}
 
@@ -234,8 +233,6 @@ public class JbonAI {
 	public Network getSelectedNetwork() { return selectedNetwork; }
 	
 	public NetworkImage getSelectedImage() { return selectedImage; }
-	
-	public Registry getRegistry() { return registry; }
 	
 	public ResourceLoader getResourceLoader() { return resourceLoader; }
 }

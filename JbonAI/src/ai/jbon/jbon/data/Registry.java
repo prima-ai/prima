@@ -17,60 +17,59 @@ public class Registry {
 	private static final Map<String, Function> functions = new HashMap<String, Function>();
 	private static final Map<String, Command> commands = new HashMap<String, Command>();
 	
-	public Node createNode(String name, String function) throws NodeGenerationException {
+	public static Node createNode(String name, String function) throws NodeGenerationException {
 		if(functions.containsKey(function) && nodes.containsKey(name)) {
+			try {
+				Constructor<? extends Node> c = nodes.get(name).getDeclaredConstructor(Function.class);
+				return c.newInstance(functions.get(function));
+			} catch(Exception e) {
+				throw new NodeGenerationException(name);
+			}
 		}
-		try {
-			Constructor<? extends Node> c = nodes.get(name).getDeclaredConstructor(Function.class);
-			return c.newInstance(functions.get(function));
-		} catch(Exception e) {
-			throw new NodeGenerationException(name);
-		}
+		return null;
 	}
 	
-	public Function getFunction(String name) throws NoRegistryEntryException {
+	public static Function getFunction(String name) {
 		if(functions.containsKey(name)) {
 			return functions.get(name);
-		} else {
-			throw new NoRegistryEntryException(name);
 		}
+		return null;
 	}
 	
-	public Command getCommand(String name) throws NoRegistryEntryException {
+	public static Command getCommand(String name) {
 		if(commands.containsKey(name)) {
 			return commands.get(name);
-		} else {
-			throw new NoRegistryEntryException(name);
 		}
+		return null;
 	}
 	
-	public void registerNode(Class<? extends Node> node) throws RegistryFailedException {
+	public static void registerNode(Class<? extends Node> node) {
 		if(!nodes.containsKey(node.getName())) {
 			nodes.put(node.getName(), node);
 		} else {
-			throw new RegistryFailedException(node, node.getName());
+			new RegistryFailedException(node, node.getName()).printStackTrace();
 		}
 	}
 	
-	public void registerFunction(Function function) throws RegistryFailedException {
+	public static void registerFunction(Function function) throws RegistryFailedException {
 		if(!functions.containsKey(function.getClass().getName())) {
 			functions.put(function.getClass().getName(), function);
 		} else {
-			throw new RegistryFailedException(function.getClass(), function.getClass().getName());
+			new RegistryFailedException(function.getClass(), function.getClass().getName()).printStackTrace();
 		}
 	}
 	
-	public void registerCommand(Command command) throws RegistryFailedException {
+	public static void registerCommand(Command command) throws RegistryFailedException {
 		if(!commands.containsKey(command.getClass().getName())) {
 			commands.put(command.getCmd(), command);
 		} else {
-			throw new RegistryFailedException(command.getClass(), command.getCmd());
+			new RegistryFailedException(command.getClass(), command.getCmd()).printStackTrace();
 		}
 	}
 
-	public Map<String, Class<? extends Node>> getNodes() { return nodes; }
+	public static Map<String, Class<? extends Node>> getNodes() { return nodes; }
 
-	public Map<String, Function> getFunctions() { return functions; }
+	public static Map<String, Function> getFunctions() { return functions; }
 
-	public Map<String, Command> getCommands() { return commands; }
+	public static Map<String, Command> getCommands() { return commands; }
 }

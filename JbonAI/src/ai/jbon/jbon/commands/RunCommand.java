@@ -8,14 +8,14 @@ import ai.jbon.jbon.JbonAI;
 import ai.jbon.jbon.NetworkImage;
 import ai.jbon.jbon.util.Log;
 
-public class StartCommand extends Command{
+public class RunCommand extends Command{
 
 	private static final String IMAGE = "image";
 	
 	private final JbonAI ai;
 	
-	public StartCommand(JbonAI ai) {
-		super("start", "Starts a network image",
+	public RunCommand(JbonAI ai) {
+		super("run", "Starts a network image",
 				Arrays.asList(),
 				Arrays.asList(IMAGE),
 				Arrays.asList());

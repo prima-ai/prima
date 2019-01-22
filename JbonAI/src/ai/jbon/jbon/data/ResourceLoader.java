@@ -29,8 +29,8 @@ public class ResourceLoader {
 	private NetworkBuilder networkBuilder;
 	private JSONParser json;
 	
-	public ResourceLoader(Registry registry) {
-		this.networkBuilder = new NetworkBuilder(registry);
+	public ResourceLoader() {
+		this.networkBuilder = new NetworkBuilder();
 		json = new JSONParser();
 	}
 

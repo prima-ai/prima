@@ -20,7 +20,6 @@ public class CreateNodeCommand extends Command{
 	private static final String FUNCTION = "function";
 		
 	private final JbonAI ai;
-	private final Registry registry;
 	
 	public CreateNodeCommand(JbonAI ai) {
 		super("node", "Creates a node to the currently selected images network", 
@@ -28,7 +27,6 @@ public class CreateNodeCommand extends Command{
 				Arrays.asList(),
 				Arrays.asList());
 		this.ai = ai;
-		this.registry = ai.getRegistry();
 	}
 
 	@Override
@@ -37,7 +35,7 @@ public class CreateNodeCommand extends Command{
 			String type = readType(args);
 			String function = readFunction(args);
 			Network network = ai.getSelectedNetwork();
-			Node node = registry.createNode(type, function);
+			Node node = Registry.createNode(type, function);
 			network.addNode(node);
 			Log.info("Created node with id " + network.getNodes().indexOf(node));
 		} catch (NodeGenerationException e) {
@@ -52,7 +50,7 @@ public class CreateNodeCommand extends Command{
 		if(term.contains(".")) {
 			return term;
 		} else {
-			return registry.getNodes().keySet().stream()
+			return Registry.getNodes().keySet().stream()
 				.filter(key -> key.toLowerCase().endsWith(term.toLowerCase())).findAny().get();
 		}
 	}
@@ -62,7 +60,7 @@ public class CreateNodeCommand extends Command{
 		if(term.contains(".")) {
 			return term;
 		} else {
-			return registry.getFunctions().entrySet().stream()
+			return Registry.getFunctions().entrySet().stream()
 					.filter(e -> e.getValue().getTag().equals(term)).findAny().get().getKey();
 		}
 	}

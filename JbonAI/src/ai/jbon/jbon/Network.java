@@ -50,10 +50,10 @@ public class Network {
 	
 	public void run() {
 		Log.info("Starting up network");
-		setupInputNodes();
-		Log.info("Set up Inputnodes");
 		injector.run();
 		Log.info("Started Injector");
+		setupInputNodes();
+		Log.info("Set up Inputnodes");
 	}
 	
 	private void setupInputNodes() {

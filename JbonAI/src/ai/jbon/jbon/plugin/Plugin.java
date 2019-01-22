@@ -15,11 +15,11 @@ public abstract class Plugin {
 		this.description = description;
 	}
 	
-	public abstract void registerNodes(Registry registry);
+	public abstract void registerNodes();
 	
-	public abstract void registerFunctions(Registry registry);
+	public abstract void registerFunctions();
 	
-	public abstract void registerCommands(Registry registry);
+	public abstract void registerCommands();
 	
 	public abstract void init(JbonAI ai);
 	

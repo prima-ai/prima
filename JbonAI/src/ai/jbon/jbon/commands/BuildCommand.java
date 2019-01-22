@@ -3,6 +3,8 @@ package ai.jbon.jbon.commands;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Optional;
 
 import ai.jbon.jbon.JbonAI;
 import ai.jbon.jbon.Network;
@@ -28,14 +30,22 @@ public class BuildCommand extends Command {
 	public void execute(Map<String, String> args) {
 		String name = args.get(NAME);
 		Network network = findNetwork(args.get(NETWORK));
-		NetworkImage image = new NetworkImage(name, network);
-		ai.getNetworkImages().add(image);
-		Log.info("Created Image " + name);
+		if(network != null) {
+			NetworkImage image = new NetworkImage(name, network);
+			ai.getNetworkImages().add(image);
+			Log.info("Created Image " + name);
+		} else {
+			Log.info("No such network.");
+		}
 	}
 	
 	private Network findNetwork(String term) {
-		return ai.getNetworks().stream()
-		.filter(network -> network.getName().equals(term)).findAny().get();
+		Optional<Network> network = ai.getNetworks().stream()
+				.filter(n -> n.getName().equals(term)).findAny();
+		if(network.isPresent()) {
+			return network.get();
+		}
+		return null;
 	}
 
 }

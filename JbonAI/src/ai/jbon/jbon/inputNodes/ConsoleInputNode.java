@@ -12,7 +12,7 @@ public class ConsoleInputNode extends InputNode{
 	private static final String TAG = "consolein";
 	
 	private Scanner scanner;
-	private boolean active = true;
+	private boolean running = true;
 	
 	public ConsoleInputNode(Function function) {
 		super(TAG, function);
@@ -27,7 +27,7 @@ public class ConsoleInputNode extends InputNode{
 
 	@Override
 	public void start() {
-		while(active) {
+		while(running) {
 			getInputValue();
 		}
 	}

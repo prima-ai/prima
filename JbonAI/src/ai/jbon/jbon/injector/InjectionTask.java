@@ -24,14 +24,6 @@ public class InjectionTask extends Thread {
 			if (!queue.isEmpty()) {
 				inject();
 			}
-
-			// TODO clean this shit -----------
-			try {
-				sleep(0, 1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			// --------------------------------
 		}
 	}
 
@@ -46,7 +38,7 @@ public class InjectionTask extends Thread {
 			});
 			List<Node> targets = gatherTargetNodes(connections);
 			calcOutputs(targets);
-			resetQueue(targets);
+			resetQueue(targets);	
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}

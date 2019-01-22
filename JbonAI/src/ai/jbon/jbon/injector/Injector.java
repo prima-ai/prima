@@ -2,6 +2,7 @@ package ai.jbon.jbon.injector;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import ai.jbon.jbon.nodes.Node;
@@ -13,7 +14,7 @@ public class Injector {
 	private Thread thread;
 
 	public Injector() {
-		queue = new ArrayList<Node>();
+		queue = Collections.synchronizedList(new ArrayList<Node>());
 		thread = new Thread(new InjectionTask(queue));
 		thread.setPriority(1);
 	}
@@ -22,11 +23,11 @@ public class Injector {
 		thread.start();
 	}
 
-	public synchronized void register(Node node) {
+	public void register(Node node) {
 		queue.add(node);
 	}
 
-	public synchronized void register(Collection<Node> nodes) {
+	public void register(Collection<Node> nodes) {
 		queue.addAll(nodes);
 	}
 }

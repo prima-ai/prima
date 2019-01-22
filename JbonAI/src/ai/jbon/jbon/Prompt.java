@@ -20,16 +20,11 @@ public class Prompt {
 
 	private static final String DEFAULT_DIRECTORY = "JbonAI";
 
-	private final Registry registry;
 	private final Scanner scanner = new Scanner(System.in);
 
 	private boolean running;
 
 	private String directory = DEFAULT_DIRECTORY;
-
-	public Prompt(Registry registry) {
-		this.registry = registry;
-	}
 
 	public void run() {
 		running = true;
@@ -60,15 +55,13 @@ public class Prompt {
 	}
 	
 	public void runCmd(String cmd) {
-		try {
-			List<String> args = parseArgs(cmd);
-			Command command = registry.getCommand(args.get(0));
+		List<String> args = parseArgs(cmd);
+		Command command = Registry.getCommand(args.get(0));
+		if(command != null) {
 			args.remove(0);
 			execute(command, args);
-		} catch (NoRegistryEntryException e) {
-			Log.error("Unknown Command");
-		} catch (IndexOutOfBoundsException e) {
-			
+		} else {
+			Log.info("Unknown Command");
 		}
 	}
 

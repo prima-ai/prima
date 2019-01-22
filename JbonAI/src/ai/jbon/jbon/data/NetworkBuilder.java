@@ -19,12 +19,6 @@ import ai.jbon.jbon.nodes.Node;
 import ai.jbon.jbon.util.Log;
 
 public class NetworkBuilder {
-
-	private final Registry registry;
-	
-	public NetworkBuilder(Registry registry) {
-		this.registry = registry;
-	}
 	
 	public Network assemble(File file, NetworkDTO dto) {
 		Map<NodeDTO, Node> nodeRegistry = generateNodes(dto.getNodes());
@@ -73,7 +67,7 @@ public class NetworkBuilder {
 			Constructor<?> constructor;
 			try {
 				constructor = Class.forName(dto.getName()).getDeclaredConstructor(Function.class);
-				Node node = (Node) constructor.newInstance(registry.getFunction(dto.getFunction()));
+				Node node = (Node) constructor.newInstance(Registry.getFunction(dto.getFunction()));
 				nodes.put(dto, node);
 			} catch (Exception e) {
 				e.printStackTrace();

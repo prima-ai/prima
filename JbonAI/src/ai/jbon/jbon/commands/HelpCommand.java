@@ -11,14 +11,11 @@ public class HelpCommand extends Command{
 
 	private static final String COMMAND = "command";
 	
-	private final Registry registry;
-	
-	public HelpCommand(Registry registry) {
+	public HelpCommand() {
 		super("help", "See available commands and their syntax",
 				Arrays.asList(),
 				Arrays.asList(COMMAND),
 				Arrays.asList());
-		this.registry = registry;
 	}
 
 	@Override
@@ -31,18 +28,14 @@ public class HelpCommand extends Command{
 	}
 	
 	private void printUsage(String cmd) {
-		try {
-			Command command = registry.getCommand(cmd);
+			Command command = Registry.getCommand(cmd);
 			Log.writeLine(command.getCmd() + ": \n"
-					+ "Description: " + command.getDescription() + "\n"
-					+ "Syntax: " + command.getUsage());
-		} catch (NoRegistryEntryException e) {
-			Log.error("Unknown Command");
-		}
+				+ "Description: " + command.getDescription() + "\n"
+				+ "Syntax: " + command.getUsage());
 	}
 	
 	private void printCommands() {
-		registry.getCommands().values().forEach(command -> {
+		Registry.getCommands().values().forEach(command -> {
 			Log.writeLine(command.getCmd() + " - " + command.getDescription());
 		});
 		Log.writeLine("\n[required parameter] <optional parameter>");
