@@ -14,23 +14,23 @@ public class Network {
 	protected String name;
 	
 	protected List<Node> nodes;
-	protected File file;
-	
+
+	public Network(){
+		this.name = "unnamed";
+	}
+
 	public Network(File file, String name, List<Node> nodes) {
-		this.file = file;
 		this.name = name;
 		this.nodes = nodes;
 	}
 	
 	public Network(String name, List<Node> nodes) {
-		this.file = new File(PrimaAI.NETWORK_DIR + "\\" + name + "." + PrimaAI.NETWORK_EXTENSION);
 		this.name = name;
 		this.nodes = nodes;
 	}
 	
 	public Network(String name) {
 		this.name = name;
-		this.file = new File(PrimaAI.NETWORK_DIR + "\\" + name + "." + PrimaAI.NETWORK_EXTENSION);
 		nodes = new ArrayList<>();
 	}
 
@@ -64,8 +64,5 @@ public class Network {
 	public void setName(String name) { this.name = name; }
 	
 	public List<Node> getNodes(){ return this.nodes; }
-	
-	public File getFile() {
-		return this.file;
-	}
+
 }

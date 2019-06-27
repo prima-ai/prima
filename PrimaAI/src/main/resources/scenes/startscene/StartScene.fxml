@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.Image?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<?import ai.prima.prima.gui.controls.SideMenuItem?>
+<?import javafx.scene.SubScene?>
+<BorderPane prefWidth="1280" prefHeight="720" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ai.prima.prima.gui.controllers.StartController">
+    <center>
+        <HBox prefWidth="1280" prefHeight="600">
+            <VBox styleClass="menuContainer" prefWidth="300" prefHeight="720">
+                <GridPane hgap="20" styleClass="header">
+                    <padding>
+                        <Insets bottom="15" left="15" right="15" top="15"/>
+                    </padding>
+                    <ImageView fitWidth="100" fitHeight="100">
+                        <image>
+                            <Image url="/images/prima.png"/>
+                        </image>
+                    </ImageView>
+                    <Label styleClass="h1" GridPane.columnIndex="1">PrimaAI</Label>
+                </GridPane>
+                <VBox prefWidth="980" prefHeight="600">
+                    <SideMenuItem text="Home" styleClass="selected">
+                        <image>
+                            <Image url="/images/prima.png"/>
+                        </image>
+                    </SideMenuItem>
+                    <SideMenuItem text="Projects">
+                        <image>
+                            <Image url="/images/prima.png"/>
+                        </image>
+                    </SideMenuItem>
+                </VBox>
+            </VBox>
+            <AnchorPane fx:id="content"/>
+        </HBox>
+    </center>
+    <top>
+        <MenuBar>
+            <Menu text="File"/>
+        </MenuBar>
+    </top>
+</BorderPane>

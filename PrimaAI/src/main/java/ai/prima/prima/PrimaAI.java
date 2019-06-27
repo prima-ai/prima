@@ -1,7 +1,6 @@
 package ai.prima.prima;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +32,15 @@ import ai.prima.prima.outputNodes.ConsoleOutputNode;
 import ai.prima.prima.plugins.Plugin;
 import ai.prima.prima.util.Log;
 import ai.prima.prima.data.ClassLoader;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.SubScene;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
-public class PrimaAI {
+public class PrimaAI extends Application {
 
     private static final String BRAND = "\n" +
             "  _____      _                          _____ \n" +
@@ -96,22 +102,28 @@ public class PrimaAI {
         unloadPlugins();
     }
 
+    @Override
+    public void start(Stage primaryStage) {
+        loadPlugins();
+    /*    try {
+            Font.loadFont(getClass().getResourceAsStream("fonts/Lato-Regular.ttf"), 12);
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("scenes/startscene/StartScene.fxml"));
+            Scene startScene = new Scene(root);
+            startScene.getStylesheets().add("themes/PrimaLight.css");
+            primaryStage.setTitle("PrimaAI");
+            primaryStage.setScene(startScene);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        prompt.run();
+    }
+
     private void initDirectories() {
         HOME_DIR.mkdirs();
         PLUGIN_DIR.mkdirs();
         NETWORK_DIR.mkdirs();
         LOG_DIR.mkdirs();
-    }
-
-    public static void main(String args[]) {
-        PrimaAI ai = new PrimaAI();
-
-        ai.loadPlugins();
-        ai.run();
-    }
-
-    public void run() {
-        prompt.run();
     }
 
     public void loadPlugins() {
@@ -218,7 +230,7 @@ public class PrimaAI {
         networks.forEach(network -> {
             try {
                 resourceLoader.storeNetwork(network);
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });

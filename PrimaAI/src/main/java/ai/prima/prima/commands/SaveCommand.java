@@ -1,6 +1,7 @@
 package ai.prima.prima.commands;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -27,8 +28,7 @@ public class SaveCommand extends Command{
 		Network network = findNetwork(args);
 		try {
 			ai.getResourceLoader().storeNetwork(network);
-			Log.info("Saved network at " + network.getFile().getPath());
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

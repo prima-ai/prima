@@ -1,0 +1,50 @@
+@font-face {
+    font-family: 'Lato';
+    src: url('../fonts/Lato-Regular.ttf');
+}
+
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: Lato;
+    -fx-font-size: 14;
+}
+
+.h1 {
+    -fx-font-size: 28;
+    -fx-text-fill: white;
+}
+
+.h2 {
+    -fx-font-size: 22;
+}
+
+.header{
+    -fx-background-color: #4286f4;
+}
+
+.menu-bar {
+    -fx-background-color: #F0F0F0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.7), 22, -10, 0, 0);
+}
+
+.menuContainer {
+    -fx-background-color: #F0F0F0;
+}
+
+.selected {
+    -fx-background-color: #1C5ABE;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.7), 22, -10, 0, 0);
+    -fx-text-fill: white;
+}
+
+.selected > .label {
+    -fx-text-fill: white;
+}
+
+.selected.hover:hover {
+    -fx-opacity: 1;
+}
+
+.hover:hover {
+    -fx-opacity: 0.5;
+}
