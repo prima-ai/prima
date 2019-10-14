@@ -11,21 +11,18 @@ import ai.prima.prima.util.Log;
 
 public class NetworkCommand extends Command{
 
-	private static final String NETWORK = "network";
+	private static final Parameter NETWORK_PARAMETER = new Parameter("network", Parameter.Requirement.OPTIONAL);
 	
 	private final PrimaAI ai;
 	
 	public NetworkCommand(PrimaAI ai) {
-		super("network", "Lists all loaded networks. or shows details about a specific network", 
-				Arrays.asList(),
-				Arrays.asList(NETWORK),
-				Arrays.asList());
+		super("network", "SHows network information", Arrays.asList(NETWORK_PARAMETER));
 		this.ai = ai;
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
-		if(args.containsKey(NETWORK)) {
+	public void execute(Map<Parameter, String> values) {
+		if(values.containsKey(NETWORK_PARAMETER)) {
 			
 		} else {
 			ai.getNetworks().forEach(network -> {

@@ -43,9 +43,6 @@ public class Injector extends Thread {
 
     private synchronized void inject() {
         List<Connection> connections = new ArrayList<Connection>();
-        if(queue == null){
-            System.out.println("wydd");
-        }
         queue.forEach(node -> {
             List<Connection> outputs = node.pushOutput();
             if (outputs != null) {

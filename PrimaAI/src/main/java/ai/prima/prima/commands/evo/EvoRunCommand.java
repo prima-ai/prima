@@ -1,6 +1,7 @@
 package ai.prima.prima.commands.evo;
 
 import ai.prima.prima.commands.Command;
+import ai.prima.prima.commands.Parameter;
 import ai.prima.prima.evolution.EvolutionPlugin;
 import ai.prima.prima.evolution.Evolution;
 import ai.prima.prima.evolution.training.Mutator;
@@ -16,22 +17,18 @@ import java.util.Optional;
 
 public class EvoRunCommand extends Command {
 
-    private static final String NAME = "name";
-    private static final String RATING = "rating";
-    private static final String MUTATOR = "mutator";
+    private static final Parameter NAME_PARAMETER = new Parameter("name", Parameter.Requirement.REQUIRED);
+    private static final Parameter RATING_PARAMETER = new Parameter("rating", Parameter.Requirement.OPTIONAL);
+    private static final Parameter MUTATOR_PARAMETER = new Parameter("mutator", Parameter.Requirement.OPTIONAL);
 
     public EvoRunCommand() {
-        super("run", "Runs an Evolution",
-                Arrays.asList(NAME),
-                Arrays.asList(RATING, MUTATOR),
-                Arrays.asList());
+        super("run", "Runs an Evolution", Arrays.asList(NAME_PARAMETER, RATING_PARAMETER, MUTATOR_PARAMETER));
     }
 
-    // TODO clean this up during registry refactoring
     @Override
-    public void execute(Map<String, String> args) {
-        String name = args.get(NAME);
-        Optional<Evolution> optional = findEvolution(args.get(NAME));
+    public void execute(Map<Parameter, String> values) {
+        String name = values.get(NAME_PARAMETER);
+        Optional<Evolution> optional = findEvolution(values.get(NAME_PARAMETER));
         if (optional.isPresent()) {
             Evolution evolution = optional.get();
             evolution.setRating(new StreamOutputRating(evolution));

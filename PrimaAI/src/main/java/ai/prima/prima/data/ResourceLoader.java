@@ -18,6 +18,8 @@ public class ResourceLoader {
 
 	public ResourceLoader() {
 		mapper = new ObjectMapper();
+		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS);
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 

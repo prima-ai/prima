@@ -1,7 +1,9 @@
 package ai.prima.prima.data;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ai.prima.prima.commands.Command;
@@ -17,7 +19,7 @@ import ai.prima.prima.util.Log;
 public class Registry {
 
     private static final Map<String, Function> functions = new HashMap<>();
-    private static final Map<String, Command> commands = new HashMap<>();
+    private static final List<Command> commands = new ArrayList<>();
     private static final Map<String, Mutator> mutators = new HashMap<>();
     private static final Map<String, Class<? extends Trainer>> trainers = new HashMap<>();
     private static final Map<String, Class<? extends Rating>> ratings = new HashMap<>();
@@ -72,12 +74,7 @@ public class Registry {
     }
 
     public static void registerCommand(Command command) {
-        String name = command.getCmd();
-        if (!commands.containsKey(name)) {
-            commands.put(name, command);
-        } else {
-            Log.warning("There already is a command with the name \"" + name + "\"");
-        }
+        commands.add(command);
     }
 
     public static void registerTrainer(Class<? extends Trainer> trainer) {
@@ -110,13 +107,6 @@ public class Registry {
         throw new NoRegistryEntryException(name);
     }
 
-    public static Command getCommand(String name) throws NoRegistryEntryException {
-        if (commands.containsKey(name)) {
-            return commands.get(name);
-        }
-        throw new NoRegistryEntryException(name);
-    }
-
     public static Mutator getMutator(String name) throws NoRegistryEntryException {
         if (mutators.containsKey(name)) {
             return mutators.get(name);
@@ -132,7 +122,8 @@ public class Registry {
         return functions;
     }
 
-    public static Map<String, Command> getCommandRegistry() {
+    public static List<Command> getCommandRegistry() {
         return commands;
     }
+
 }

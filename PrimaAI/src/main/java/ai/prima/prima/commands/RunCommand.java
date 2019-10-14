@@ -9,22 +9,20 @@ import ai.prima.prima.util.Log;
 
 public class RunCommand extends Command{
 
-	private static final String IMAGE = "image";
+	private static final Parameter IMAGE_PARAMETER = new Parameter("image", Parameter.Requirement.OPTIONAL);
 	
 	private final PrimaAI ai;
 	
 	public RunCommand(PrimaAI ai) {
-		super("run", "Starts a network image",
-				Arrays.asList(),
-				Arrays.asList(IMAGE),
-				Arrays.asList());
+		super("run", "Starts a network image", Arrays.asList(IMAGE_PARAMETER));
 		this.ai = ai;
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
-		if(args.containsKey(IMAGE)) {
-			String name = args.get(IMAGE);
+	public void execute(Map<Parameter, String> values) {
+		ai.getPrompt().stop();
+		if(values.containsKey(IMAGE_PARAMETER)) {
+			String name = values.get(IMAGE_PARAMETER);
 			findImage(name).start();
 			Log.info("Started image " + name);
 		} else {

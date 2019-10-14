@@ -1,10 +1,6 @@
 package ai.prima.prima;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -28,70 +24,19 @@ public class Prompt {
 	public void run() {
 		running = true;
 		while (running) {
-			String cmd = readConsole();
-			runCmd(cmd);
+			String input = readConsole();
+			runCmd(input);
 		}
 	}
 
-	private void execute(Command command, List<String> args) {
-		try {
-			Command target = redirectCommand(command, args);
-			Map<String, String> params = buildParams(target, args);
-			target.run(params);
-		} catch (CommandSyntaxException e) {
-			Log.error("Ivalid syntax. Syntax: " + command.getUsage());
-		}
-	}
-
-	private Command redirectCommand(Command command, List<String> args) {
-		if(args.size() > 0) {
-			List<Command> subcommands = command.getSubcommands();
-			if (subcommands.stream().anyMatch(c -> c.getCmd().equals(args.get(0)))) {
-				Command target = subcommands.stream().filter(c -> c.getCmd().equals(args.get(0))).findAny().get();
-				args.remove(0);
-				return redirectCommand(target, args);
-			}
-		}
-		return command;
-	}
-	
-	public void runCmd(String cmd) {
-		List<String> args = parseArgs(cmd);
-		try {
-			Command command = Registry.getCommand(args.get(0));
-			args.remove(0);
-			execute(command, args);
-		} catch (NoRegistryEntryException e) {
-			Log.writeLine("Unknown command");
-		}
-	}
-
-	private Map<String, String> buildParams(Command command, List<String> args) throws CommandSyntaxException {
-		Map<String, String> params = new HashMap<>();
-		try {
-			IntStream.range(0, args.size()).forEach(index -> {
-				if (args.size() > index) {
-					processParam(command, args, index, params);
-				}
-			});
-		} catch (Exception e) {
-			throw new CommandSyntaxException(command);
-		}
-		return params;
-	}
-
-	private void processParam(Command command, List<String> args, int index, Map<String, String> params) {
-		String arg = args.get(index);
-		if (arg.startsWith("-")) {
-			params.put(arg.substring(1, arg.length()), args.get(index + 1).replaceAll("\"", ""));
-			args.remove(arg);
+	public void runCmd(String input) {
+		List<String> arguments = parseArgs(input);
+		Optional<Command> command = Registry.getCommandRegistry().stream().filter(command1 -> command1.getShortcut().equals(arguments.get(0))).findFirst();
+		if(command.isPresent()) {
+			arguments.remove(0);
+			command.get().run(arguments);
 		} else {
-			if (params.size() >= command.getParams().size()) {
-				params.put(command.getOptionals().get(params.size() - command.getParams().size()),
-					arg.replaceAll("\"", ""));
-			} else {
-				params.put(command.getParams().get(index), arg.replaceAll("\"", ""));
-			}
+			Log.info("Unknown command");
 		}
 	}
 
@@ -103,6 +48,10 @@ public class Prompt {
 			args.add(regexMatcher.group());
 		}
 		return args;
+	}
+
+	public void stop() {
+		running = false;
 	}
 
 	private String readConsole() {

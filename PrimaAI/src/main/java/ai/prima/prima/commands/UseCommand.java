@@ -9,24 +9,21 @@ import ai.prima.prima.NetworkImage;
 
 public class UseCommand extends Command {
 
-	private static final String TYPE = "type";
-	private static final String ITEM = "item";
+	private static final Parameter TYPE_PARAMETER = new Parameter("type", Parameter.Requirement.OPTIONAL);
+	private static final Parameter ITEM_PARAMETER = new Parameter("item", Parameter.Requirement.OPTIONAL);
 
 	private final PrimaAI ai;
 	
 	public UseCommand(PrimaAI ai) {
-		super("use", "Selects a network or an image in order to edit it faster. Leave item empty to unselect", 
-				Arrays.asList(),
-				Arrays.asList(ITEM, TYPE),
-				Arrays.asList());
+		super("use", "Selects a network or an image in order to edit it faster. Leave item empty to unselect", Arrays.asList(TYPE_PARAMETER, ITEM_PARAMETER));
 		this.ai = ai;
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
-		String item = args.get(ITEM);
-		if(args.containsKey(TYPE)) {
-			selectDefinedType(item, args.get(TYPE));
+	public void execute(Map<Parameter, String> values) {
+		String item = values.get(ITEM_PARAMETER);
+		if(values.containsKey(TYPE_PARAMETER)) {
+			selectDefinedType(item, values.get(TYPE_PARAMETER));
 		} else {
 			searchItem(item);
 		}

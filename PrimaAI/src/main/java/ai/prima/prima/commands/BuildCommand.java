@@ -11,30 +11,14 @@ import ai.prima.prima.util.Log;
 
 public class BuildCommand extends Command {
 
-	private static final String NAME = "name";
-	private static final String NETWORK = "network";
+	private static final Parameter NETWORK_PARAMETER = new Parameter("network", Parameter.Requirement.REQUIRED);
+	private static final Parameter NAME_PARAMETER = new Parameter("name", Parameter.Requirement.REQUIRED);
 		
 	private final PrimaAI ai;
 	
 	public BuildCommand(PrimaAI ai) {
-		super("build", "Builds a new image with a network reference",
-				Arrays.asList(NAME, NETWORK),
-				Arrays.asList(),
-				Arrays.asList());
+		super("build", "Creates a runnable image from a network", Arrays.asList(NETWORK_PARAMETER, NAME_PARAMETER));
 		this.ai = ai;
-	}
-
-	@Override
-	public void execute(Map<String, String> args) {
-		String name = args.get(NAME);
-		Network network = findNetwork(args.get(NETWORK));
-		if(network != null) {
-			NetworkImage image = NetworkImage.build(name, network);
-			ai.getNetworkImages().add(image);
-			Log.info("Created Image " + name);
-		} else {
-			Log.info("No such network.");
-		}
 	}
 	
 	private Network findNetwork(String term) {
@@ -46,4 +30,16 @@ public class BuildCommand extends Command {
 		return null;
 	}
 
+	@Override
+	public void execute(Map<Parameter, String> values) {
+		String name = values.get(NAME_PARAMETER);
+		Network network = findNetwork(values.get(NETWORK_PARAMETER));
+		if(network != null) {
+			NetworkImage image = NetworkImage.build(name, network);
+			ai.getNetworkImages().add(image);
+			Log.info("Created Image " + name);
+		} else {
+			Log.info("No such network.");
+		}
+	}
 }

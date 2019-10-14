@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import ai.prima.prima.PrimaAI;
 import ai.prima.prima.Network;
 import ai.prima.prima.commands.Command;
+import ai.prima.prima.commands.Parameter;
 import ai.prima.prima.data.Registry;
 import ai.prima.prima.exceptions.NodeGenerationException;
 import ai.prima.prima.nodes.Node;
@@ -14,25 +15,21 @@ import ai.prima.prima.util.Log;
 
 public class CreateNodeCommand extends Command{
 
-	private static final String TYPE = "type";
-	
-	private static final String FUNCTION = "function";
+	private static final Parameter TYPE_PARAMETER = new Parameter("type", Parameter.Requirement.REQUIRED);
+	private static final Parameter FUNCTION_PARAMETER = new Parameter("function", Parameter.Requirement.REQUIRED);
 		
 	private final PrimaAI ai;
 	
 	public CreateNodeCommand(PrimaAI ai) {
-		super("node", "Creates a node to the currently selected images network", 
-				Arrays.asList(TYPE, FUNCTION),
-				Arrays.asList(),
-				Arrays.asList());
+		super("node", "Creates a node to the currently selected images network", Arrays.asList(TYPE_PARAMETER, FUNCTION_PARAMETER));
 		this.ai = ai;
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
+	public void execute(Map<Parameter, String> values) {
 		try {
-			String type = readType(args);
-			String function = readFunction(args);
+			String type = readType(values);
+			String function = readFunction(values);
 			Network network = ai.getSelectedNetwork();
 			Node node = Registry.createNode(type, function);
 			network.addNode(node);
@@ -44,8 +41,8 @@ public class CreateNodeCommand extends Command{
 		}
 	}
 	
-	private String readType(Map<String, String> args) throws NoSuchElementException {
-		String term = args.get(TYPE);
+	private String readType(Map<Parameter, String> values) throws NoSuchElementException {
+		String term = values.get(TYPE_PARAMETER);
 		if(term.contains(".")) {
 			return term;
 		} else {
@@ -54,13 +51,13 @@ public class CreateNodeCommand extends Command{
 		}
 	}
 	
-	private String readFunction(Map<String, String> args) throws NoSuchElementException {
-		String term = args.get(FUNCTION);
+	private String readFunction(Map<Parameter, String> args) throws NoSuchElementException {
+		String term = args.get(FUNCTION_PARAMETER);
 		if(term.contains(".")) {
 			return term;
 		} else {
 			return Registry.getFunctionRegistry().entrySet().stream()
-					.filter(e -> e.getValue().getTag().equals(term)).findAny().get().getKey();
+					.filter(e -> e.getValue().getClass().getName().equals(term)).findAny().get().getKey();
 		}
 	}
 }

@@ -33,11 +33,6 @@ import ai.prima.prima.plugins.Plugin;
 import ai.prima.prima.util.Log;
 import ai.prima.prima.data.ClassLoader;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class PrimaAI extends Application {
@@ -54,7 +49,8 @@ public class PrimaAI extends Application {
     private static final File USERHOME = new File(System.getProperty("user.home"));
     public static final File HOME_DIR = new File(USERHOME + "\\primaai");
     public static final File PLUGIN_DIR = new File("..\\plugins");
-    public static final File NETWORK_DIR = new File(USERHOME + "\\primaai\\networks");
+    public static final File NETWORK_DIR = new File(HOME_DIR + "\\networks");
+    public static final File SCRIPT_DIR = new File(HOME_DIR + "\\scripts");
     public static final File LOG_DIR = new File("..\\logs");
 
     public static final String NETWORK_EXTENSION = "network";
@@ -64,6 +60,7 @@ public class PrimaAI extends Application {
     private final List<Network> networks = new ArrayList<>();
     private final List<NetworkImage> images = new ArrayList<>();
     private final List<Plugin> plugins = new ArrayList<>();
+    private final List<Script> scripts = new ArrayList<>();
     private final Prompt prompt = new Prompt();
 
     private Network selectedNetwork;
@@ -123,6 +120,7 @@ public class PrimaAI extends Application {
         HOME_DIR.mkdirs();
         PLUGIN_DIR.mkdirs();
         NETWORK_DIR.mkdirs();
+        SCRIPT_DIR.mkdir();
         LOG_DIR.mkdirs();
     }
 

@@ -5,6 +5,6 @@ import ai.prima.prima.commands.Command;
 public class CommandSyntaxException extends Exception {
 
 	public CommandSyntaxException(Command command) {
-		super("Invalid syntax for command " + command.getCmd());
+		super("Invalid syntax for command " + command.getShortcut());
 	}
 }

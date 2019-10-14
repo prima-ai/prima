@@ -1,6 +1,5 @@
 package ai.prima.prima.commands;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import ai.prima.prima.data.Registry;
@@ -9,17 +8,13 @@ import ai.prima.prima.util.Log;
 public class FunctionCommand extends Command {
 
 	public FunctionCommand() {
-		super("function", "lists loaded activation functions",
-				Arrays.asList(),
-				Arrays.asList(),
-				Arrays.asList());
+		super("function", "Lists all registered activation functions.");
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
+	public void execute(Map<Parameter, String> values) {
 		Registry.getFunctionRegistry().entrySet().forEach(entry -> {
-			Log.info(entry.getValue().getTag() + ":" + entry.getKey());
+			Log.info(entry.getValue().getClass().getName() + ":" + entry.getKey());
 		});
 	}
-
 }

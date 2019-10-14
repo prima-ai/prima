@@ -12,14 +12,10 @@ public class NetworkImage extends Thread{
 	
 	private final Network network; 
 	
-	private NetworkImage(final String name, final Network network) {
+	public NetworkImage(final String name, final Network network) {
 		this.setName(name);
 		injector.setName(name + "-Injector");
 		this.network = network;
-	}
-	
-	public static NetworkImage build(String name, Network network) {
-		return new NetworkImage(name, network);
 	}
 	
 	private List<InputNode> findInputNodes() {

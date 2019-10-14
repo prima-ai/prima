@@ -7,25 +7,23 @@ import java.util.Map;
 import ai.prima.prima.PrimaAI;
 import ai.prima.prima.Network;
 import ai.prima.prima.commands.Command;
+import ai.prima.prima.commands.Parameter;
 import ai.prima.prima.util.Log;
 
 public class DeleteNetworkCommand extends Command {
 
-	private static final String NETWORK = "network";
+	private static final Parameter NETWORK_PARAMETER = new Parameter("network", Parameter.Requirement.REQUIRED);
 	
 	private final PrimaAI ai;
 	
 	public DeleteNetworkCommand(PrimaAI ai) {
-		super("network", "Deletes a network and its file",
-				Arrays.asList(NETWORK),
-				Arrays.asList(),
-				Arrays.asList());
+		super("network", "Deletes a network and its file", Arrays.asList(NETWORK_PARAMETER));
 		this.ai = ai;
 	}
 
 	@Override
-	public void execute(Map<String, String> args) {
-		String name = args.get(NETWORK);
+	public void execute(Map<Parameter, String> values) {
+		String name = values.get(NETWORK_PARAMETER);
 		if(ai.getNetworks().stream().anyMatch(n -> n.getName().equals(name))) {
 			Network network = ai.getNetworks().stream().filter(n -> n.getName().equals(name)).findAny().get();
 			deleteFile(network);

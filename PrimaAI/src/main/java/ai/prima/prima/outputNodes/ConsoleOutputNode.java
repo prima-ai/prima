@@ -25,7 +25,7 @@ public class ConsoleOutputNode extends OutputNode {
 	@Override
 	public void execute(float value) {
 		try {
-			writer.write(Float.toString(value));
+			writer.write(Float.toString(value) + "\n");
 			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import ai.prima.prima.PrimaAI;
 import ai.prima.prima.commands.Command;
+import ai.prima.prima.commands.Parameter;
 
 public class DeleteCommand extends Command {
 
@@ -13,14 +14,13 @@ public class DeleteCommand extends Command {
 	public DeleteCommand(PrimaAI ai) {
 		super("delete", "Deletes a PrimaAI item",
 				Arrays.asList(),
-				Arrays.asList(),
 				Arrays.asList(new DeleteNetworkCommand(ai), new DeleteNodeCommand(ai)));
 		this.ai = ai;
 	}
 
+
 	@Override
-	public void execute(Map<String, String> args) {
-
+	public void execute(Map<Parameter, String> values) {
+		
 	}
-
 }

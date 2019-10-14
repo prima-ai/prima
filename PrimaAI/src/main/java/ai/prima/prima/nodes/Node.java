@@ -13,6 +13,11 @@ public class Node {
 	protected List<Connection> connections;
 	private List<Float> valueBuffer;
 
+	public Node(){
+		valueBuffer = new ArrayList<>();
+		valueBuffer.add(bias);
+	}
+
 	public Node(Function function) {
 		this.connections = new ArrayList<>();
 		this.function = function;
